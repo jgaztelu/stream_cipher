@@ -8,7 +8,7 @@ library ieee;
     r_WIDTH  : integer :=  128;
     r_STEP   : integer := 1;
     r_FWIDTH  : integer := 6;
-    r_TAPS    : TAPS (0 to 31):= (32,47,58,90,121,128,others=>-1)           -- Change the size according to the number of taps
+    r_TAPS    : TAPS (0 to 31):= (128,121,90,58,47,32,others=>-1)           -- Change the size according to the number of taps
     );
 
     port (
@@ -44,7 +44,8 @@ begin
 end process;
 out_data <= shifted ((r_WIDTH-1) downto (r_WIDTH-r_STEP));
 
-    gen_feedback: for I in 0 to (r_FWIDTH-1) generate
+-- Connect taps in the order of r_TAPS, from LSB to MSB (First value in the array goes to LSB of the output)
+    gen_feedback: for I in 0 to (r_FWIDTH-1)  generate
       fb_out(I) <= shifted(r_TAPS(I)-1);
     end generate gen_feedback;
 

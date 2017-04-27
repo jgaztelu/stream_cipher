@@ -16,7 +16,7 @@ library ieee;
     port (
     clk      : in std_logic;
     rst      : in std_logic;
-    feedback : in std_logic_vector ((r_STEP-1) downto 0);
+    fb_in    : in std_logic_vector ((r_STEP-1) downto 0);
     init     : in std_logic;
     ini_data : in std_logic_vector ((r_WIDTH-1) downto 0);
     out_data : out std_logic_vector ((r_STEP-1) downto 0);
@@ -37,12 +37,12 @@ elsif clk'event and clk = '1' then
 end if;
 end process;
 
-process (feedback,init,ini_data,shifted)
+process (fb_in,init,ini_data,shifted)
 begin
   if init = '1' then
     shifted_next <= ini_data;
   else
-    shifted_next <= shifted((r_WIDTH-r_STEP-1) downto 0) & feedback;
+    shifted_next <= shifted((r_WIDTH-r_STEP-1) downto 0) & fb_in;
   end if;
 end process;
 out_data <= shifted ((r_WIDTH-1) downto (r_WIDTH-r_STEP));

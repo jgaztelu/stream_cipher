@@ -5,10 +5,10 @@ library ieee;
   entity FSR is
 
     generic (
-    r_WIDTH  : integer :=  128;
-    r_STEP   : integer := 1;
-    r_FWIDTH  : integer := 6;
-    r_HWIDTH  : integer := 2;
+    r_WIDTH  : integer :=  128; -- Register width
+    r_STEP   : integer := 1;  -- Update step
+    r_FWIDTH  : integer := 6; -- Feedback output width
+    r_HWIDTH  : integer := 2; -- h-function output width
     r_TAPS    : TAPS (0 to 31):= (128,121,90,58,47,32,others=>-1);           -- Change the size according to the number of taps
     r_STATE   : TAPS (0 to 15):= (116,33, others => -1)
     );

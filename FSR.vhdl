@@ -47,14 +47,16 @@ begin
 end process;
 out_data <= shifted ((r_WIDTH-1) downto (r_WIDTH-r_STEP));
 
--- Connect taps in the order of r_TAPS, from LSB to MSB (First value in the array goes to LSB of the output)
-    gen_feedback: for I in 0 to (r_FWIDTH-1)  generate
-      fb_out(I) <= shifted(r_TAPS(I)-1);
+-- The bits defined in the r_TAPS and r_STATE arrays are connected to the outputs in the same order as they are written (left to right)
+-- Example: r_TAPS := (10,6) will create fb_out (1 downto 0) = bit10 & bit 6, in that order
+-- Connect taps in the order of r_TAPS
+    gen_feedback: for I in (r_FWIDTH-1) downto 0 generate
+      fb_out(I) <= shifted(r_STATE(r_FWIDTH-I-1));		
     end generate gen_feedback;
 
 -- Connect output bits for h function
-    gen_h: for I in 0 to (r_HWIDTH-1)  generate
-      h_out(I) <= shifted(r_STATE(I)-1);
+    gen_h: for I in (r_HWIDTH-1) downto 0 generate
+      h_out(I) <= shifted(r_STATE(r_FWIDTH-I-1));
     end generate gen_h;
 
 end architecture;

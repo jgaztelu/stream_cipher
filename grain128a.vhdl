@@ -63,8 +63,9 @@ end component grain_linear_fb;
 
 component h_function
 port (
-  states_in : in  std_logic_vector(8 downto 0);
-  h_out     : out std_logic
+  nfsr_in :  in std_logic_vector (1 downto 0);
+  lfsr_in :   in std_logic_vector (6 downto 0);	
+  h_out     :  out std_logic
 );
 end component h_function;
 
@@ -92,8 +93,8 @@ generic map (
   r_STEP   => 1,
   r_FWIDTH => 6,
   r_HWIDTH => 2,
-  r_TAPS   => (128,121,90,58,47,32,others=>-1),
-  r_STATE  => (33,116,others => -1)
+  r_TAPS   => (128,121,90,58,47,32),
+  r_STATE  => (34,49,68,86,108,115,120)
 )
 port map (
   clk      => clk,
@@ -112,8 +113,8 @@ generic map (
   r_STEP   => 1,
   r_FWIDTH => 29,
   r_HWIDTH => 7,
-  r_TAPS   => (40,36,35,33,106,104,106,58,50,46,117,115,111,110,88,80,101,69,67,63,125,61,60,44,128,102,72,37,32,others => -1),
-  r_STATE  => (34,49,68,86,108,115,120,others =>-1)
+  r_TAPS   => (40,36,35,33,106,104,106,58,50,46,117,115,111,110,88,80,101,69,67,63,125,61,60,44,128,102,72,37,32),
+  r_STATE  => (33,116)
 )
 port map (
   clk      => clk,
@@ -121,7 +122,7 @@ port map (
   fb_in    => nfsr_fb,
   init     => init,
   ini_data (127 downto 32) => IV,
-  ini_data (31 downto 1) => '0',
+  ini_data (31 downto 1) => (others => '0'),
   ini_data (0)      => '1',
   out_data => open,
   fb_out   => nfsr_fb_taps,
@@ -147,7 +148,8 @@ port map (
 
 h_function_i : h_function
 port map (
-  states_in => states_in,
+  nfsr_in => nfsr_h,
+  lfsr_in => lfsr_h,
   h_out     => h_out
 );
 

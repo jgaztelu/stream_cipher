@@ -5,12 +5,14 @@ library ieee;
   entity FSR is
 
     generic (
-    r_WIDTH  : integer; -- Register width
-    r_STEP   : integer;  -- Update step
-    r_FWIDTH  : integer; -- Feedback output width
-    r_HWIDTH  : integer; -- h-function output width
-    r_TAPS    : TAPS;           -- Change the size according to the number of taps
-    r_STATE   : TAPS
+    r_WIDTH    : integer; -- Register width
+    r_STEP     : integer;  -- Update step
+    r_FWIDTH   : integer; -- Feedback output width
+    r_HWIDTH   : integer; -- h-function output width
+    r_PREWIDTH : integer; -- Pre-output function output width
+    r_TAPS     : TAPS;    -- Change the size according to the number of taps
+    r_STATE    : TAPS;
+    r_PRE      : TAPS
     );
 
     port (
@@ -21,7 +23,8 @@ library ieee;
     ini_data : in std_logic_vector ((r_WIDTH-1) downto 0);
     out_data : out std_logic_vector ((r_STEP-1) downto 0);
     fb_out   : out std_logic_vector ((r_FWIDTH-1) downto 0);
-    h_out    : out std_logic_vector ((r_HWIDTH-1) downto 0)
+    h_out    : out std_logic_vector ((r_HWIDTH-1) downto 0);
+    pre_out  : out std_logic_vector ((r_PREWIDTH-1) downto 0)
     );
   end entity;
 
@@ -58,5 +61,10 @@ out_data <= shifted ((r_WIDTH-1) downto (r_WIDTH-r_STEP));
     gen_h: for I in (r_HWIDTH-1) downto 0 generate
       h_out(I) <= shifted(r_STATE(r_HWIDTH-I-1));
     end generate gen_h;
+
+-- Connect output bits for the pre-output function
+    gen_pre: for I in (r_PREWIDTH-1) downto 0 generate
+      pre_out(I) <= shifted(r_PRE(r_PREWIDTH-I-1));
+    end generate gen_pre;
 
 end architecture;

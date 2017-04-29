@@ -4,13 +4,13 @@ library ieee;
 
 entity grain128a_controller is
   port (
-  clk        : in  std_logic;
-  rst        : in  std_logic;
-  new_key : in  std_logic;
-  IV0        : in std_logic;
-  auth       : out std_logic;
-  init_FSR   : out std_logic;   -- Initialise FSRs with new values
-  init       : out std_logic    -- Set to 1 during initialisation rounds
+  clk      : in  std_logic;
+  rst      : in  std_logic;
+  IV0      : in std_logic;
+  new_key  : in std_logic;
+  auth     : out std_logic;
+  init_FSR : out std_logic;   -- Initialise FSRs with new values
+  init     : out std_logic    -- Set to 1 during initialisation rounds
   );
 end entity;
 
@@ -36,7 +36,7 @@ elsif clk'event and clk= '1' then
 end if;
 end process;
 
-combinational : process(new_key,IV0)
+combinational : process(new_key,IV0,init_counter,current_state)
 begin
 --Default values
 init     <= '0';

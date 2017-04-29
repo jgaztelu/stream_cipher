@@ -8,5 +8,5 @@ library IEEE;
   use ieee.std_logic_1164.all;
 
 package fsr_taps_type is
-    type TAPS is array (integer range <>) of integer;
+    type TAPS is array (0 to 31) of integer;
 end package fsr_taps_type;

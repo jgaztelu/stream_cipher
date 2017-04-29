@@ -5,12 +5,12 @@ library ieee;
   entity FSR is
 
     generic (
-    r_WIDTH  : integer :=  128; -- Register width
-    r_STEP   : integer := 1;  -- Update step
-    r_FWIDTH  : integer := 6; -- Feedback output width
-    r_HWIDTH  : integer := 2; -- h-function output width
-    r_TAPS    : TAPS (0 to 31):= (128,121,90,58,47,32,others=>-1);           -- Change the size according to the number of taps
-    r_STATE   : TAPS (0 to 15):= (116,33, others => -1)
+    r_WIDTH  : integer; -- Register width
+    r_STEP   : integer;  -- Update step
+    r_FWIDTH  : integer; -- Feedback output width
+    r_HWIDTH  : integer; -- h-function output width
+    r_TAPS    : TAPS;           -- Change the size according to the number of taps
+    r_STATE   : TAPS
     );
 
     port (
@@ -25,8 +25,8 @@ library ieee;
     );
   end entity;
 
-    architecture behavioural of FSR is
-    signal shifted,shifted_next  : std_logic_vector((r_WIDTH-1) downto 0);
+architecture behavioural of FSR is
+signal shifted,shifted_next  : std_logic_vector((r_WIDTH-1) downto 0);
 begin
 process(clk,rst)
 begin
@@ -51,12 +51,12 @@ out_data <= shifted ((r_WIDTH-1) downto (r_WIDTH-r_STEP));
 -- Example: r_TAPS := (10,6) will create fb_out (1 downto 0) = bit10 & bit 6, in that order
 -- Connect taps in the order of r_TAPS
     gen_feedback: for I in (r_FWIDTH-1) downto 0 generate
-      fb_out(I) <= shifted(r_STATE(r_FWIDTH-I-1));		
+      fb_out(I) <= shifted(r_STATE(r_FWIDTH-I-1));
     end generate gen_feedback;
 
 -- Connect output bits for h function
     gen_h: for I in (r_HWIDTH-1) downto 0 generate
-      h_out(I) <= shifted(r_STATE(r_FWIDTH-I-1));
+      h_out(I) <= shifted(r_STATE(r_HWIDTH-I-1));
     end generate gen_h;
 
 end architecture;

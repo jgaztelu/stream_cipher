@@ -9,13 +9,14 @@ entity grain128a_datapath is
   STEP  : integer := 1
   );
   port (
-  clk   : in std_logic;
-  rst   : in std_logic;
-  init  : in std_logic;
-  auth  : in std_logic;
-  key   : in std_logic_vector (127 downto 0);
-  IV    : in std_logic_vector (95 downto 0);
-  stream  : out std_logic;
+  clk      : in std_logic;
+  rst      : in std_logic;
+  init     : in std_logic;
+  init_FSR : in std_logic;
+  auth     : in std_logic;
+  key      : in std_logic_vector (127 downto 0);
+  IV       : in std_logic_vector (95 downto 0);
+  stream   : out std_logic
   );
 end entity;
 
@@ -47,7 +48,7 @@ component grain_nonlinear_fb
 port (
   taps_in    : in  std_logic_vector(28 downto 0);
   pre_out_in : in  std_logic;
-  init       : in  std_logic;
+  initialising       : in  std_logic;
   lfsr_in    : in  std_logic;
   fb_out     : out std_logic
 );
@@ -57,7 +58,7 @@ component grain_linear_fb
 port (
   taps_in    : in  std_logic_vector  (5 downto 0);
   pre_out_in : in  std_logic;
-  init       : in  std_logic;
+  initialising       : in  std_logic;
   fb_out     : out std_logic
 );
 end component grain_linear_fb;
@@ -101,7 +102,7 @@ port map (
   clk      => clk,
   rst      => rst,
   fb_in    => lfsr_fb,
-  init     => init,
+  init     => init_FSR,
   ini_data => key,
   out_data => lfsr_out,
   fb_out   => lfsr_fb_taps,
@@ -121,7 +122,7 @@ port map (
   clk      => clk,
   rst      => rst,
   fb_in    => nfsr_fb,
-  init     => init,
+  init     => init_FSR,
   ini_data => (others => '0'),
   out_data => open,
   fb_out   => nfsr_fb_taps,
@@ -133,7 +134,7 @@ grain_linear_fb_i : grain_linear_fb
 port map (
   taps_in    => lfsr_fb_taps,
   pre_out_in => pre_out,
-  init       => init,
+  initialising       => init,
   fb_out     => lfsr_fb (0)
 );
 
@@ -141,7 +142,7 @@ grain_nonlinear_fb_i : grain_nonlinear_fb
 port map (
   taps_in    => nfsr_fb_taps,
   pre_out_in => pre_out,
-  init       => init,
+  initialising       => init,
   lfsr_in    => lfsr_out(0),
   fb_out     => nfsr_fb (0)
 );

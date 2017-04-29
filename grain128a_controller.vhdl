@@ -4,19 +4,19 @@ library ieee;
 
 entity grain128a_controller is
   port (
-  clk      : in  std_logic;
-  rst      : in  std_logic;
-  new_key  : in  std_logic;
-  IV0      : in std_logic;
-  auth     : out std_logic;
-  init_FSR : out std_logic;   -- Initialise FSRs with new values
-  init     : out std_logic    -- Set to 1 during initialisation rounds
+  clk        : in  std_logic;
+  rst        : in  std_logic;
+  new_key : in  std_logic;
+  IV0        : in std_logic;
+  auth       : out std_logic;
+  init_FSR   : out std_logic;   -- Initialise FSRs with new values
+  init       : out std_logic    -- Set to 1 during initialisation rounds
   );
 end entity;
 
 architecture arch of grain128a_controller is
 
-type state_type is (new_key,initialise,auth,no_auth)
+type state_type is (s_new_key,s_initialise,s_auth,s_noauth);
 
 signal current_state     : state_type;
 signal next_state        : state_type;
@@ -28,7 +28,7 @@ begin
 synchronous : process(clk,rst)
 begin
 if rst = '1' then
-  current_state <= new_key;
+  current_state <= s_new_key;
   init_counter <= (others => '0');
 elsif clk'event and clk= '1' then
   current_state <= next_state;
@@ -36,7 +36,7 @@ elsif clk'event and clk= '1' then
 end if;
 end process;
 
-combinational : process(new_key,auth,start)
+combinational : process(new_key,IV0)
 begin
 --Default values
 init     <= '0';
@@ -45,44 +45,44 @@ auth     <= '0';
 init_counter_next <= init_counter;
 
 case (current_state) is
-  when new_key =>
+  when s_new_key =>
     init_FSR <= '1';
     init_counter_next <= (others => '0');
     if new_key = '0' then
-      next_state <= initialise;
+      next_state <= s_initialise;
     else
-      next_state <= new_key;
+      next_state <= s_new_key;
     end if;
 
-  when initialise =>
+  when s_initialise =>
     init <= '1';
     init_counter_next <= init_counter + 1;
     if new_key = '1' then
-      next_state <= new_key;
+      next_state <= s_new_key;
     elsif init_counter = 255 then
-      if IV0 = 1 then
-        next_state <= auth;
+      if IV0 = '1' then
+        next_state <= s_auth;
       else
-        next_state <= no_auth;
+        next_state <= s_noauth;
       end if;
     else
-      next_state <= initialise;
+      next_state <= s_initialise;
     end if;
 
-  when auth =>
-    auth <= '1'
+  when s_auth =>
+    auth <= '1';
     if new_key = '1' then
-      next_state <= new_key;
+      next_state <= s_new_key;
     else
-      next_state <= auth;
+      next_state <= s_auth;
     end if;
 
-  when no_auth =>
+  when s_noauth =>
     auth <= '0';
     if new_key = '1' then
-      next_state <= new_key;
+      next_state <= s_new_key;
     else
-      next_state <= auth;
+      next_state <= s_noauth;
     end if;
 end case;
 

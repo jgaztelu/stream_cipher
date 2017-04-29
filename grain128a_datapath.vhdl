@@ -4,21 +4,22 @@ library ieee;
   use work.fsr_taps_type.all;
 
 
-entity grain128a is
+entity grain128a_datapath is
   generic (
-  STEP :  integer := 1
+  STEP  : integer := 1
   );
   port (
-  clk  : in std_logic;
-  rst  : in std_logic;
-  init : in std_logic;
-  auth : in std_logic;
-  key  : in std_logic_vector (127 downto 0);
-  IV   : in std_logic_vector (95 downto 0)
+  clk   : in std_logic;
+  rst   : in std_logic;
+  init  : in std_logic;
+  auth  : in std_logic;
+  key   : in std_logic_vector (127 downto 0);
+  IV    : in std_logic_vector (95 downto 0);
+  stream  : out std_logic;
   );
 end entity;
 
-architecture arch of grain128a is
+architecture arch of grain128a_datapath is
 
 -- Component declarations
 component FSR

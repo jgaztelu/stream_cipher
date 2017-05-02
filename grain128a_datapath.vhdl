@@ -110,16 +110,18 @@ generic map (
   r_FWIDTH => 6,
   r_HWIDTH => 7,
   r_PREWIDTH => 1,
-  r_TAPS   => (128,121,90,58,47,32,others => 0),
-  r_STATE  => (34,49,68,86,108,115,120,others => 0),
-  r_PRE   =>  (35,others => 0) --(128-93)
+  r_TAPS   => (97,82,71,39,8,1,others => 0),
+  r_STATE  => (8,13,20,42,60,79,94,others => 0),
+  r_PRE   =>  (92,others => 0) --(128-93)
 )
 port map (
   clk      => clk,
   rst      => rst,
   fb_in    => lfsr_fb,
   init     => init_FSR,
-  ini_data => key,
+  ini_data (95 downto 0) => IV,
+  ini_data (126 downto 96) => (others => '0'),
+  ini_data (127) => '1',	
   out_data => lfsr_out,
   fb_out   => lfsr_fb_taps,
   h_out    => lfsr_h,
@@ -133,18 +135,16 @@ generic map (
   r_FWIDTH => 29,
   r_HWIDTH => 2,
   r_PREWIDTH => 7,
-  r_TAPS   => (40,36,35,33,106,104,103,58,50,46,117,115,111,110,88,80,101,69,67,63,125,61,60,44,128,102,72,37,32,others => 0),
-  r_STATE  => (33,116,others => 0),
-  r_PRE   =>  (126,113,92,83,64,55,39,others => 0) --(128-93)
+  r_TAPS   => (97,92,57,27,1,85,69,68,4,66,62,60,28,49,19,18,14,12,83,79,71,26,25,23,96,94,93,others => 0),
+  r_STATE  => (12,95,others => 0),
+  r_PRE   =>  (2,15,36,45,64,73,89,others => 0) --(128-93)
 )
 port map (
   clk      => clk,
   rst      => rst,
   fb_in    => nfsr_fb,
   init     => init_FSR,
-  ini_data (127 downto 32) => IV,
-  ini_data (31 downto 1) => (others => '0'),
-  ini_data (0) => '1',
+  ini_data => key,
   out_data => open,
   fb_out   => nfsr_fb_taps,
   h_out    => nfsr_h,

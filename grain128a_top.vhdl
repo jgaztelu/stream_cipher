@@ -10,6 +10,8 @@ entity grain128a_top is
   key     : in std_logic_vector (127 downto 0);
   IV      : in std_logic_vector (95 downto 0);
   stream  : out std_logic
+  --lfsr_state : out std_logic_vector (127 downto 0);
+  --nfsr_state : out std_logic_vector (127 downto 0)
   );
 end entity;
 
@@ -40,7 +42,9 @@ architecture arch of grain128a_top is
     auth     : in  std_logic;
     key      : in  std_logic_vector (127 downto 0);
     IV       : in  std_logic_vector (95 downto 0);
-    stream   : out std_logic
+    stream   : out std_logic;
+    --lfsr_state : out std_logic_vector (127 downto 0);
+    --nfsr_state : out std_logic_vector (127 downto 0)
   );
   end component grain128a_datapath;
 
@@ -56,6 +60,9 @@ begin
     rst      => rst,
     IV0      => IV(0),
     new_key  => new_key,
+   
+    --lfsr_state : out std_logic_vector (127 downto 0);
+    --nfsr_state : out std_logic_vector (127 downto 0)
     auth     => auth,
     init_FSR => init_FSR,
     init     => init
@@ -74,6 +81,8 @@ begin
     key      => key,
     IV       => IV,
     stream   => stream
+    --lfsr_state => lfsr_state,
+    --nfsr_state => nfsr_state
   );
 
 end architecture;

@@ -1,6 +1,8 @@
 library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
+  use ieee.std_logic_textio.all;
+  use std.textio.all;
 
 entity grain128a_tb is
 end entity;
@@ -14,6 +16,8 @@ architecture arch of grain128a_tb is
     key     : in  std_logic_vector (127 downto 0);
     IV      : in  std_logic_vector (95 downto 0);
     stream  : out std_logic
+    --lfsr_state : out std_logic_vector (127 downto 0);
+    --nfsr_state : out std_logic_vector (127 downto 0)
   );
   end component grain128a_top;
 
@@ -27,8 +31,20 @@ signal key     : std_logic_vector (127 downto 0);
 signal IV      : std_logic_vector (95 downto 0);
 signal stream  : std_logic;
 signal save_stream  : std_logic_vector (255 downto 0);
+signal lfsr_state : std_logic_vector (127 downto 0);  
+signal nfsr_state : std_logic_vector (127 downto 0);
+
+signal lfsr_out : std_logic_vector (127 downto 0);  
+signal nfsr_out : std_logic_vector (127 downto 0);
+signal lfsr_error      : std_logic;
+signal nfsr_error      : std_logic;
 
 shared variable i :  integer range 0 to 1024;
+signal row_counter : integer:=0;
+shared variable row         : line;
+shared variable row_data    : std_logic_vector(127 downto 0);
+
+file input_data : text open read_mode is "/h/d7/w/ja8602ga-s/Crypto/grain_state.txt";
 
 
 begin
@@ -58,7 +74,7 @@ begin
   i:=0;
   save_stream <= (others => '0');
 wait for 5*clk_period;
-while (i<=512) loop
+while (i<=255) loop
   save_stream <= save_stream (254 downto 0) & stream;
   i := i+1;
   wait for clk_period;
@@ -66,6 +82,8 @@ end loop;
 wait;
 end process;
 
+
+    
 uut : grain128a_top
 port map (
   clk     => clk,
@@ -74,6 +92,8 @@ port map (
   key     => key,
   IV      => IV,
   stream  => stream
+  --lfsr_state => lfsr_out,
+  --nfsr_state => nfsr_out
 );
 
 end architecture;

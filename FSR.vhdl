@@ -25,6 +25,7 @@ library ieee;
     fb_out   : out std_logic_vector ((r_FWIDTH-1) downto 0);
     h_out    : out std_logic_vector ((r_HWIDTH-1) downto 0);
     pre_out  : out std_logic_vector ((r_PREWIDTH-1) downto 0)
+    --current_state : out std_logic_vector ((r_WIDTH-1) downto 0)
     );
   end entity;
 
@@ -46,16 +47,17 @@ begin
   if init = '1' then
     shifted_next <= ini_data;
   else
-    shifted_next <= shifted((r_WIDTH-r_STEP-1) downto 0) & fb_in;
+    shifted_next <= fb_in & shifted((r_WIDTH-1) downto r_STEP);
   end if;
 end process;
 out_data <= shifted ((r_WIDTH-1) downto (r_WIDTH-r_STEP));
+--current_state <= shifted;
 
 -- The bits defined in the r_TAPS and r_STATE arrays are connected to the outputs in the same order as they are written (left to right)
 -- Example: r_TAPS := (10,6) will create fb_out (1 downto 0) = bit10 & bit 6, in that order
 -- Connect taps in the order of r_TAPS
     gen_feedback: for I in (r_FWIDTH-1) downto 0 generate
-      fb_out(I) <= shifted(r_STATE(r_FWIDTH-I-1));
+      fb_out(I) <= shifted(r_TAPS(r_FWIDTH-I-1));
     end generate gen_feedback;
 
 -- Connect output bits for h function

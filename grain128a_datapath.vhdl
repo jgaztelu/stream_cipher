@@ -16,7 +16,9 @@ entity grain128a_datapath is
   auth     : in std_logic;
   key      : in std_logic_vector (127 downto 0);
   IV       : in std_logic_vector (95 downto 0);
-  stream   : out std_logic
+  stream   : out std_logic;
+  --lfsr_state : out std_logic_vector (127 downto 0);
+  --nfsr_state : out std_logic_vector (127 downto 0)
   );
 end entity;
 
@@ -44,6 +46,7 @@ port (
   fb_out   : out std_logic_vector ((r_FWIDTH-1) downto 0);
   h_out    : out std_logic_vector ((r_HWIDTH-1) downto 0);
   pre_out  : out std_logic_vector ((r_PREWIDTH-1) downto 0)
+  --current_state : out std_logic_vector ((r_WIDTH-1) downto 0)
 );
 end component FSR;
 
@@ -110,9 +113,9 @@ generic map (
   r_FWIDTH => 6,
   r_HWIDTH => 7,
   r_PREWIDTH => 1,
-  r_TAPS   => (97,82,71,39,8,1,others => 0),
-  r_STATE  => (8,13,20,42,60,79,94,others => 0),
-  r_PRE   =>  (92,others => 0) --(128-93)
+  r_TAPS   => (31,46,57,89,120,127,others => 0),
+  r_STATE  => (119,114,109,85,67,48,33,others => 0),
+  r_PRE   =>  (34,others => 0) --(128-93)
 )
 port map (
   clk      => clk,
@@ -120,12 +123,13 @@ port map (
   fb_in    => lfsr_fb,
   init     => init_FSR,
   ini_data (95 downto 0) => IV,
-  ini_data (126 downto 96) => (others => '0'),
-  ini_data (127) => '1',	
+  ini_data (126 downto 96) => (others => '1'),
+  ini_data (127) => '0',	
   out_data => lfsr_out,
   fb_out   => lfsr_fb_taps,
   h_out    => lfsr_h,
   pre_out  => lfsr_pre
+  --current_state => lfsr_state
 );
 
 NFSR : FSR
@@ -135,9 +139,10 @@ generic map (
   r_FWIDTH => 29,
   r_HWIDTH => 2,
   r_PREWIDTH => 7,
-  r_TAPS   => (97,92,57,27,1,85,69,68,4,66,62,60,28,49,19,18,14,12,83,79,71,26,25,23,96,94,93,others => 0),
-  r_STATE  => (12,95,others => 0),
-  r_PRE   =>  (2,15,36,45,64,73,89,others => 0) --(128-93)
+  r_TAPS   => (31,36,71,101,127,43,59,60,124,62,66,68,100,79,87,109,110,114,116,45,49,57,102,103,105,32,34,35,39
+,others => 0),
+  r_STATE  => (115,32,others => 0),
+  r_PRE   =>  (125,112,91,82,63,54,38,others => 0) 
 )
 port map (
   clk      => clk,
@@ -149,6 +154,7 @@ port map (
   fb_out   => nfsr_fb_taps,
   h_out    => nfsr_h,
   pre_out  => nfsr_pre
+  --current_state => nfsr_state
 );
 
 

@@ -15,9 +15,9 @@ architecture arch of grain128a_tb is
     new_key : in  std_logic;
     key     : in  std_logic_vector (127 downto 0);
     IV      : in  std_logic_vector (95 downto 0);
-    stream  : out std_logic
-    --lfsr_state : out std_logic_vector (127 downto 0);
-    --nfsr_state : out std_logic_vector (127 downto 0)
+    stream  : out std_logic;
+    lfsr_state : out std_logic_vector (127 downto 0);
+    nfsr_state : out std_logic_vector (127 downto 0)
   );
   end component grain128a_top;
 
@@ -82,6 +82,32 @@ end loop;
 wait;
 end process;
 
+file_process: process
+begin
+    row_counter <= 0;
+    wait for 4*clk_period;
+    while not endfile(input_data) and row_counter < 256 loop
+        readline(input_data,row);
+        read (row,row_data);
+	lfsr_state <= row_data;
+        readline(input_data,row);
+        read (row,row_data);
+	nfsr_state <= row_data;
+	row_counter <= row_counter + 2;
+	wait for clk_period;
+    end loop;
+    wait;
+end process;
+
+compare_process: process(lfsr_state,lfsr_out)
+begin
+    
+    if lfsr_state = lfsr_out then
+      lfsr_error <= '0';
+    else 
+      lfsr_error <= '1';
+    end if;
+end process;
 
     
 uut : grain128a_top
@@ -91,9 +117,9 @@ port map (
   new_key => new_key,
   key     => key,
   IV      => IV,
-  stream  => stream
-  --lfsr_state => lfsr_out,
-  --nfsr_state => nfsr_out
+  stream  => stream,
+  lfsr_state => lfsr_out,
+  nfsr_state => nfsr_out
 );
 
 end architecture;

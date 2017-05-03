@@ -24,8 +24,8 @@ library ieee;
     out_data : out std_logic_vector ((r_STEP-1) downto 0);
     fb_out   : out std_logic_vector ((r_FWIDTH-1) downto 0);
     h_out    : out std_logic_vector ((r_HWIDTH-1) downto 0);
-    pre_out  : out std_logic_vector ((r_PREWIDTH-1) downto 0)
-    --current_state : out std_logic_vector ((r_WIDTH-1) downto 0)
+    pre_out  : out std_logic_vector ((r_PREWIDTH-1) downto 0);
+    current_state : out std_logic_vector ((r_WIDTH-1) downto 0)
     );
   end entity;
 
@@ -50,8 +50,8 @@ begin
     shifted_next <= fb_in & shifted((r_WIDTH-1) downto r_STEP);
   end if;
 end process;
-out_data <= shifted ((r_WIDTH-1) downto (r_WIDTH-r_STEP));
---current_state <= shifted;
+out_data <= shifted ((r_STEP-1) downto 0);
+current_state <= shifted;
 
 -- The bits defined in the r_TAPS and r_STATE arrays are connected to the outputs in the same order as they are written (left to right)
 -- Example: r_TAPS := (10,6) will create fb_out (1 downto 0) = bit10 & bit 6, in that order

@@ -17,8 +17,8 @@ entity grain128a_datapath is
   key      : in std_logic_vector (127 downto 0);
   IV       : in std_logic_vector (95 downto 0);
   stream   : out std_logic;
-  --lfsr_state : out std_logic_vector (127 downto 0);
-  --nfsr_state : out std_logic_vector (127 downto 0)
+  lfsr_state : out std_logic_vector (127 downto 0);
+  nfsr_state : out std_logic_vector (127 downto 0)
   );
 end entity;
 
@@ -45,8 +45,8 @@ port (
   out_data : out std_logic_vector ((r_STEP-1) downto 0);
   fb_out   : out std_logic_vector ((r_FWIDTH-1) downto 0);
   h_out    : out std_logic_vector ((r_HWIDTH-1) downto 0);
-  pre_out  : out std_logic_vector ((r_PREWIDTH-1) downto 0)
-  --current_state : out std_logic_vector ((r_WIDTH-1) downto 0)
+  pre_out  : out std_logic_vector ((r_PREWIDTH-1) downto 0);
+  current_state : out std_logic_vector ((r_WIDTH-1) downto 0)
 );
 end component FSR;
 
@@ -113,9 +113,9 @@ generic map (
   r_FWIDTH => 6,
   r_HWIDTH => 7,
   r_PREWIDTH => 1,
-  r_TAPS   => (31,46,57,89,120,127,others => 0),
-  r_STATE  => (119,114,109,85,67,48,33,others => 0),
-  r_PRE   =>  (34,others => 0) --(128-93)
+  r_TAPS   => (96,81,70,38,7,0,others => 0), --reversed
+  r_STATE  => (8,13,18,42,60,79,94,others => 0), --reversed
+  r_PRE   =>  (93,others => 0) --reversed
 )
 port map (
   clk      => clk,
@@ -128,8 +128,8 @@ port map (
   out_data => lfsr_out,
   fb_out   => lfsr_fb_taps,
   h_out    => lfsr_h,
-  pre_out  => lfsr_pre
-  --current_state => lfsr_state
+  pre_out  => lfsr_pre,
+  current_state => lfsr_state
 );
 
 NFSR : FSR
@@ -139,10 +139,9 @@ generic map (
   r_FWIDTH => 29,
   r_HWIDTH => 2,
   r_PREWIDTH => 7,
-  r_TAPS   => (31,36,71,101,127,43,59,60,124,62,66,68,100,79,87,109,110,114,116,45,49,57,102,103,105,32,34,35,39
-,others => 0),
-  r_STATE  => (115,32,others => 0),
-  r_PRE   =>  (125,112,91,82,63,54,38,others => 0) 
+  r_TAPS   => (96,91,56,26,0,84,68,67,3,65,61,59,27,48,40,18,17,13,11,82,78,70,25,24,23,95,93,92,88,others => 0),--reversed
+  r_STATE  => (12,95,others => 0),--reversed
+  r_PRE   =>  (2,15,36,45,64,73,89,others => 0) --reversed
 )
 port map (
   clk      => clk,
@@ -153,8 +152,8 @@ port map (
   out_data => open,
   fb_out   => nfsr_fb_taps,
   h_out    => nfsr_h,
-  pre_out  => nfsr_pre
-  --current_state => nfsr_state
+  pre_out  => nfsr_pre,
+  current_state => nfsr_state
 );
 
 

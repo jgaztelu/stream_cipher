@@ -93,19 +93,25 @@ begin
         readline(input_data,row);
         read (row,row_data);
 	nfsr_state <= row_data;
-	row_counter <= row_counter + 2;
+	row_counter <= row_counter + 1;
 	wait for clk_period;
     end loop;
     wait;
 end process;
 
-compare_process: process(lfsr_state,lfsr_out)
+compare_process: process(lfsr_state,lfsr_out,nfsr_state,nfsr_out)
 begin
     
     if lfsr_state = lfsr_out then
       lfsr_error <= '0';
     else 
       lfsr_error <= '1';
+    end if;
+
+    if nfsr_state = nfsr_out then
+      nfsr_error <= '0';
+    else 
+      nfsr_error <= '1';
     end if;
 end process;
 

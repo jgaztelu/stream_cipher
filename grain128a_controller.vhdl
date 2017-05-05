@@ -22,6 +22,8 @@ signal current_state     : state_type;
 signal next_state        : state_type;
 signal init_counter      : unsigned (7 downto 0);
 signal init_counter_next : unsigned (7 downto 0);
+signal auth_counter      : unsigned (6 downto 0);
+signal auth_counter_next : unsigned (6 downto 0);
 
 begin
 
@@ -30,24 +32,28 @@ begin
 if rst = '1' then
   current_state <= s_new_key;
   init_counter <= (others => '0');
+  auth_counter <= (others => '0');
 elsif clk'event and clk= '1' then
   current_state <= next_state;
   init_counter <= init_counter_next;
+  auth_counter <= auth_counter_next;
 end if;
 end process;
 
-combinational : process(new_key,IV0,init_counter,current_state)
+combinational : process(new_key,IV0,init_counter,auth_counter,current_state)
 begin
 --Default values
 init     <= '0';
 init_FSR <= '0';
 auth     <= '0';
 init_counter_next <= init_counter;
+auth_counter_next <= auth_counter;
 
 case (current_state) is
   when s_new_key =>
     init_FSR <= '1';
     init_counter_next <= (others => '0');
+    auth_counter_next <= (others => '0');
     if new_key = '0' then
       next_state <= s_initialise;
     else
@@ -71,6 +77,11 @@ case (current_state) is
 
   when s_auth =>
     auth <= '1';
+
+    if auth_counter < 63 then
+      auth_counter_next <= auth_counter + 1;
+    end if;
+
     if new_key = '1' then
       next_state <= s_new_key;
     else

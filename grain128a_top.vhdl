@@ -26,7 +26,8 @@ architecture arch of grain128a_top is
     new_key  : in std_logic;
     auth     : out std_logic;
     init_FSR : out std_logic;
-    init     : out std_logic    -- Set to 1 during initialisation rounds
+    init     : out std_logic;    -- Set to 1 during initialisation rounds
+    pre_64   : out std_logic     -- Set to 1 after 64 pre-output rounds if auth = 1
   );
   end component grain128a_controller;
 
@@ -42,15 +43,17 @@ architecture arch of grain128a_top is
     auth     : in  std_logic;
     key      : in  std_logic_vector (127 downto 0);
     IV       : in  std_logic_vector (95 downto 0);
+    pre_64   : in  std_logic;
     stream   : out std_logic;
     lfsr_state : out std_logic_vector (127 downto 0);
     nfsr_state : out std_logic_vector (127 downto 0)
   );
   end component grain128a_datapath;
 
-  signal  init  : std_logic;
-  signal  init_FSR  : std_logic;
-  signal  auth  : std_logic;
+  signal  init     : std_logic;
+  signal  init_FSR : std_logic;
+  signal  auth     : std_logic;
+  signal pre_64    : std_logic;
 begin
 
 -- Component instantiations
@@ -60,9 +63,10 @@ begin
     rst      => rst,
     IV0      => IV(0),
     new_key  => new_key,
-       auth     => auth,
+    auth     => auth,
     init_FSR => init_FSR,
-    init     => init
+    init     => init,
+    pre_64  =>  pre_64
   );
 
   grain128a_datapath_i : grain128a_datapath
@@ -77,6 +81,7 @@ begin
     auth     => auth,
     key      => key,
     IV       => IV,
+    pre_64  =>  pre_64,
     stream   => stream,
     lfsr_state => lfsr_state,
     nfsr_state => nfsr_state

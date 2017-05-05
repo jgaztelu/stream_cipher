@@ -16,6 +16,7 @@ entity grain128a_datapath is
   auth     : in std_logic;
   key      : in std_logic_vector (127 downto 0);
   IV       : in std_logic_vector (95 downto 0);
+  pre_64   : in  std_logic;
   stream   : out std_logic;
   lfsr_state : out std_logic_vector (127 downto 0);
   nfsr_state : out std_logic_vector (127 downto 0)
@@ -47,7 +48,7 @@ port (
   h_out    : out std_logic_vector ((r_HWIDTH-1) downto 0);
   pre_out  : out std_logic_vector ((r_PREWIDTH-1) downto 0);
   current_state : out std_logic_vector ((r_WIDTH-1) downto 0)
-);
+  );
 end component FSR;
 
 
@@ -86,6 +87,18 @@ h_in    : in std_logic;
 pre_out : out std_logic
 );
 end component pre_output;
+
+component grain_auth
+port (
+  clk        : in  std_logic;
+  rst        : in  std_logic;
+  auth       : in  std_logic;
+  pre_64     : in  std_logic;
+  pre_out_in : in  std_logic;
+  keystream  : out std_logic
+);
+end component grain_auth;
+
 
 -- Signal declarations
 
@@ -189,6 +202,15 @@ port map (
   pre_out => pre_out
 );
 
+grain_auth_i : grain_auth
+port map (
+  clk        => clk,
+  rst        => rst,
+  auth       => auth,
+  pre_64     => pre_64,
+  pre_out_in => pre_out,
+  keystream  => keystream
+);
 
 
 stream <= keystream;

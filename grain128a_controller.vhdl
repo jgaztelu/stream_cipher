@@ -10,7 +10,8 @@ entity grain128a_controller is
   new_key  : in std_logic;
   auth     : out std_logic;
   init_FSR : out std_logic;   -- Initialise FSRs with new values
-  init     : out std_logic    -- Set to 1 during initialisation rounds
+  init     : out std_logic;   -- Set to 1 during initialisation rounds
+  pre_64   : out std_logic    -- Set to 1 after 64 pre-output rounds if auth = 1
   );
 end entity;
 
@@ -48,6 +49,7 @@ init_FSR <= '0';
 auth     <= '0';
 init_counter_next <= init_counter;
 auth_counter_next <= auth_counter;
+pre_64  <= '0';
 
 case (current_state) is
   when s_new_key =>
@@ -80,6 +82,8 @@ case (current_state) is
 
     if auth_counter < 63 then
       auth_counter_next <= auth_counter + 1;
+    else
+      pre_64 <= '1';
     end if;
 
     if new_key = '1' then

@@ -114,7 +114,7 @@ generic map (
   r_HWIDTH => 7,
   r_PREWIDTH => 1,
   r_TAPS   => (96,81,70,38,7,0,others => 0), --reversed
-  r_STATE  => (8,13,18,42,60,79,94,others => 0), --reversed
+  r_STATE  => (8,13,20,42,60,79,94,others => 0), --reversed
   r_PRE   =>  (93,others => 0) --reversed
 )
 port map (

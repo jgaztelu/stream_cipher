@@ -63,7 +63,9 @@ begin
   rst <= '0';
   new_key <= '1';
   key <= (others => '0');
-  IV <= (others => '0');
+--  IV <= (others => '0');
+  IV (95 downto 4) <= (others => '0');
+  IV (3 downto 0) <= "0001";
   wait for clk_period;
   new_key <= '0';
   wait;
@@ -73,12 +75,22 @@ save_stream_proc : process
 begin
   i:=0;
   save_stream <= (others => '0');
+while rst = '1' loop
+end loop;
 wait for 5*clk_period;
-while (i<=255) loop
-  save_stream <= save_stream (254 downto 0) & stream;
+
+while (i<255) loop
   i := i+1;
   wait for clk_period;
 end loop;
+i := 0;
+wait for clk_period;
+while (i<=255) loop
+  save_stream <= save_stream (254 downto 0) & stream;
+  i := i+1;  
+  wait for clk_period;
+end loop;
+
 wait;
 end process;
 

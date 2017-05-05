@@ -87,6 +87,18 @@ pre_out : out std_logic
 );
 end component pre_output;
 
+component grain128a_auth
+port (
+  clk        : in  std_logic;
+  rst        : in  std_logic;
+  pre_out_in : in  std_logic;
+  auth       : in  std_logic;
+  init       : in  std_logic;
+  keystream  : out std_logic
+);
+end component grain128a_auth;
+
+
 
 -- Signal declarations
 
@@ -101,6 +113,7 @@ signal lfsr_h       : std_logic_vector (6 downto 0);
 signal nfsr_pre     : std_logic_vector (6 downto 0);
 signal lfsr_pre     : std_logic_vector (0 downto 0);
 signal pre_out      : std_logic;
+signal keystream    : std_logic;
 
 
 begin
@@ -124,7 +137,7 @@ port map (
   init     => init_FSR,
   ini_data (95 downto 0) => IV,
   ini_data (126 downto 96) => (others => '1'),
-  ini_data (127) => '0',	
+  ini_data (127) => '0',
   out_data => lfsr_out,
   fb_out   => lfsr_fb_taps,
   h_out    => lfsr_h,
@@ -189,7 +202,18 @@ port map (
   pre_out => pre_out
 );
 
-stream <= pre_out;
+grain128a_auth_i : grain128a_auth
+port map (
+  clk        => clk,
+  rst        => rst,
+  pre_out_in => pre_out,
+  auth       => auth,
+  init       => init,
+  keystream  => keystream
+);
+
+
+stream <= keystream;
 
 
 end architecture;

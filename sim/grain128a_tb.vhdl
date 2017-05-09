@@ -30,7 +30,7 @@ signal new_key : std_logic;
 signal key     : std_logic_vector (127 downto 0);
 signal IV      : std_logic_vector (95 downto 0);
 signal stream  : std_logic;
-signal save_stream  : std_logic_vector (255 downto 0);
+signal save_stream  : std_logic_vector (127 downto 0);
 signal lfsr_state : std_logic_vector (127 downto 0);  
 signal nfsr_state : std_logic_vector (127 downto 0);
 
@@ -38,11 +38,13 @@ signal lfsr_out : std_logic_vector (127 downto 0);
 signal nfsr_out : std_logic_vector (127 downto 0);
 signal lfsr_error      : std_logic;
 signal nfsr_error      : std_logic;
+signal keystream_OK	: std_logic;
 
 shared variable i :  integer range 0 to 1024;
 signal row_counter : integer:=0;
 shared variable row         : line;
 shared variable row_data    : std_logic_vector(127 downto 0);
+
 
 file input_data : text open read_mode is "/h/d7/w/ja8602ga-s/Crypto/grain_state.txt";
 
@@ -63,7 +65,7 @@ begin
   rst <= '0';
   new_key <= '1';
   key <= (others => '0');
---  IV <= (others => '0');
+  --IV <= (others => '0');
   IV (95 downto 4) <= (others => '0');
   IV (3 downto 0) <= "0001";
   wait for clk_period;
@@ -72,7 +74,9 @@ begin
 end process;
 
 save_stream_proc : process
+
 begin
+  keystream_OK <='0';
   i:=0;
   save_stream <= (others => '0');
 while rst = '1' loop
@@ -84,11 +88,11 @@ while (i<255) loop
   wait for clk_period;
 end loop;
 i := 0;
-wait for clk_period;
-while (i<=255) loop
-  save_stream <= save_stream (254 downto 0) & stream;
+wait for 64*clk_period;
+while (i<=128) loop
+  save_stream <= save_stream (126 downto 0) & stream;
   i := i+1;  
-  wait for clk_period;
+  wait for 2*clk_period;
 end loop;
 
 wait;

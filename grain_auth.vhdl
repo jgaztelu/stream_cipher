@@ -33,17 +33,18 @@ end process;
 
 process(auth,pre_64,pre_out_in,z,even_bit)
 begin
-  even_bit_next <= not (even_bit);
+  even_bit_next <= even_bit;
   if auth = '0' then
     z_next <= pre_out_in;
   elsif pre_64 = '1' then
+    even_bit_next <= not (even_bit);
     if even_bit = '1' then
       z_next <= pre_out_in;
     else
       z_next <= z;
     end if;
   else
-    z_next <= '0';
+    z_next <= pre_out_in;
   end if;
 keystream <= z;
 end process;

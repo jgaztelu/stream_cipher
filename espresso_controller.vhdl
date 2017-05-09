@@ -4,11 +4,11 @@ library ieee;
 
 entity espresso_controller is
   port (
-  clk : in std_logic;
-  rst : in std_logic;
-  new_key : in std_logic
+  clk      : in std_logic;
+  rst      : in std_logic;
+  new_key  : in std_logic;
   init_FSR : out std_logic;
-  init    : out std_logic
+  init     : out std_logic
   );
 end entity;
 

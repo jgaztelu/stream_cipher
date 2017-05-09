@@ -13,18 +13,18 @@ entity espresso_controller is
 end entity;
 
 architecture arch of espresso_controller is
-type state_type is (new_key,initialisation,keystream)
+type state_type is (s_new_key,s_initialisation,s_keystream);
 signal  current_state,next_state  : state_type;
 signal init_counter, init_counter_next : unsigned (8 downto 0);
 begin
 synchronous : process(clk,rst)
 begin
   if rst = '1' then
-    current_state <= new_key;
+    current_state <= s_new_key;
     init_counter <= (others => '0');
   elsif clk'event and clk='1' then
     current_state <= next_state;
-    init_counter <= init_counter_next:
+    init_counter <= init_counter_next;
   end if;
 end process;
 
@@ -34,30 +34,30 @@ init <= '0';
 init_FSR <= '0';
 
 case (current_state) is
-  when new_key  =>
+  when s_new_key  =>
     init_FSR <= '1';
     if new_key = '1' then
-      next_state <= new_key;
+      next_state <= s_new_key;
     else
-      next_state <= initialisation;
+      next_state <= s_initialisation;
     end if;
 
-    when initialisation =>
+    when s_initialisation =>
       init <= '1';
       init_counter_next <= init_counter + 1;
       if new_key = '1' then
-        next_state <= new_key;
+        next_state <= s_new_key;
       elsif init_counter < 258 then
-        next_state <= initialisation;
+        next_state <= s_initialisation;
       else
-        next_state <= keystream;
+        next_state <= s_keystream;
       end if;
 
-    when keystream =>
+    when s_keystream =>
       if new_key = '1' then
-        next_state <= new_key;
+        next_state <= s_new_key;
       else
-        next_state <= keystream;
+        next_state <= s_keystream;
       end if;
   end case;
 end process;

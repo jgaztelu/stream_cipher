@@ -40,7 +40,7 @@ end process;
 
 combinational : process(z1,z2,z3,z4,z5,z6,z7,z8,z_in)
 begin
-  z1_next <= z_in(25) z_in(24) xor z_in(23) xor z_in(22);
+  z1_next <= z_in(25) xor z_in(24) xor z_in(23) xor z_in(22);
   z2_next <= z_in(21) xor z_in(20) xor (z_in(19) and z_in(18));
   z3_next <= (z_in(17) and z_in(16)) xor (z_in(15) and z_in(14));
   z4_next <= (z_in(13) and z_in(12)) xor (z_in(11) and z_in(10));

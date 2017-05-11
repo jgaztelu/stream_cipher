@@ -32,6 +32,7 @@ combinational : process(current_state,init_counter,new_key)
 begin
 init <= '0';
 init_FSR <= '0';
+init_counter_next <= init_counter;
 
 case (current_state) is
   when s_new_key  =>
@@ -47,7 +48,7 @@ case (current_state) is
       init_counter_next <= init_counter + 1;
       if new_key = '1' then
         next_state <= s_new_key;
-      elsif init_counter < 258 then
+      elsif init_counter < 255 then
         next_state <= s_initialisation;
       else
         next_state <= s_keystream;

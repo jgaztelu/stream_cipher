@@ -50,11 +50,11 @@ begin
     init     => init,
     ini_data (127 downto 0) => key,
     ini_data (223 downto 128) => IV,
-    ini_data (254 downto 224) => '1',
+    ini_data (254 downto 224) => (others => '1'),
     ini_data (255) =>   '0',
     z_in     => z_result,
     z_out    => z_bits,
-    out_data => out_data
+    out_data => open
   );
 
   espresso_z_i : espresso_z
@@ -65,5 +65,6 @@ begin
     z_out => z_result
   );
 
+keystream <= z_result;
 
 end architecture;

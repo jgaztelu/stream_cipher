@@ -48,6 +48,8 @@ begin
   z6_next <= z_in(5) and z_in(4) and z_in(3) and z_in(2) and z_in(1) and z_in(0);
   z7_next <= z1 xor z2 xor z3 xor z4;
   z8_next <= z5 xor z6;
-  z_out <= z7 xor z8;
+  --z_out <= z7 xor z8;
+  z_out <= z_in(25) xor z_in(24) xor z_in(23) xor z_in(22) xor z_in(21) xor z_in(20) xor (z_in(19) and z_in(18)) xor (z_in(17) and z_in(16)) xor (z_in(15) and z_in(14)) xor
+	   (z_in(13) and z_in(12)) xor (z_in(11) and z_in(10)) xor (z_in(9) and z_in(8)) xor (z_in(7) and z_in(6)) xor (z_in(5) and z_in(4) and z_in(3) and z_in(2) and z_in(1) and z_in(0));
 end process;
 end architecture;

@@ -18,6 +18,8 @@ architecture arch of espresso_tb is
   );
   end component espresso_top;
 
+constant clk_period : time := 10 ns;
+
 signal clk       : std_logic;
 signal rst       : std_logic;
 signal new_key   : std_logic;
@@ -25,7 +27,8 @@ signal key       : std_logic_vector (127 downto 0);
 signal IV        : std_logic_vector (95 downto 0);
 signal keystream : std_logic;
 
-signal save_stream  : std_logic_vector (255 downto 0);
+signal save_stream  : std_logic_vector (159 downto 0);
+shared variable i :  integer range 0 to 1024 := 0;
 begin
 
   clock_gen : process
@@ -38,12 +41,15 @@ begin
 
   stim_process : process
   begin
-    rst <= '1';
+    rst <= '1'; 
+    new_key <= '1';
+    key <= (others => '0');
+    IV <= (others => '0');
+    --key <= x"000102030405060708090A0B0C0D0E0F";
+    --IV <= x"000102030405060708090A0B";
     wait for 2*clk_period;
     rst <= '0';
-    new_key <= '1';
-    key <= x"000102030405060708090A0B0C0D0E0F";
-    IV <= x"000102030405060708090A0B";
+    --new_key <= '1';
     --IV (95 downto 4) <= (others => '0');
     --IV (3 downto 0) <= "0001";
     wait for clk_period;
@@ -54,20 +60,19 @@ begin
   save_stream_proc : process
 
   begin
-    keystream_OK <='0';
     i:=0;
     save_stream <= (others => '0');
   while rst = '1' loop
   end loop;
   wait for 5*clk_period;
-  while (i<255) loop
+  while (i<259) loop
     i := i+1;
     wait for clk_period;
   end loop;
   i := 0;
   wait for 64*clk_period;
   while (i<=255) loop
-    save_stream <= save_stream (254 downto 0) & stream;
+    save_stream <= save_stream (158 downto 0) & keystream;
     i := i+1;
     wait for clk_period;
   end loop;

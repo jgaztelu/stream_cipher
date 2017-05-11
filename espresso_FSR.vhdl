@@ -82,4 +82,5 @@ z_out(3) <= shifted(243);
 z_out(2) <= shifted(213);
 z_out(1) <= shifted(181);
 z_out(0) <= shifted(174);
+out_data <= shifted(0);
 end architecture;

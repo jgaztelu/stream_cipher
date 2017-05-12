@@ -30,7 +30,7 @@ signal new_key : std_logic;
 signal key     : std_logic_vector (127 downto 0);
 signal IV      : std_logic_vector (95 downto 0);
 signal stream  : std_logic;
-signal save_stream  : std_logic_vector (127 downto 0);
+signal save_stream  : std_logic_vector (255 downto 0);
 signal lfsr_state : std_logic_vector (127 downto 0);  
 signal nfsr_state : std_logic_vector (127 downto 0);
 
@@ -61,13 +61,14 @@ end process;
 stim_process : process
 begin
   rst <= '1';
-  wait for 2*clk_period;
+  new_key <= '1';
+  wait for 1.5*clk_period;
   rst <= '0';
   new_key <= '1';
-  key <= (others => '0');
-  --IV <= (others => '0');
-  IV (95 downto 4) <= (others => '0');
-  IV (3 downto 0) <= "0001";
+  key <= (others => '1');
+  IV <= (others => '1');
+  --IV (95 downto 4) <= (others => '0');
+  --IV (3 downto 0) <= "0001";
   wait for clk_period;
   new_key <= '0';
   wait;
@@ -76,23 +77,29 @@ end process;
 save_stream_proc : process
 
 begin
-  keystream_OK <='0';
   i:=0;
   save_stream <= (others => '0');
 while rst = '1' loop
 end loop;
-wait for 5*clk_period;
-
+wait for 4*clk_period;
 while (i<255) loop
   i := i+1;
   wait for clk_period;
 end loop;
 i := 0;
-wait for 64*clk_period;
-while (i<=128) loop
-  save_stream <= save_stream (126 downto 0) & stream;
-  i := i+1;  
-  wait for 2*clk_period;
+--if IV(0) = '1' then
+  --wait for 66*clk_period;     -- Key-stream with auth
+--else
+  wait for 2*clk_period;        -- Pre-output
+--end if;
+while (i<=255) loop
+  save_stream <= save_stream (254 downto 0) & stream;
+  i := i+1;
+  --if IV(0) = '1' then  
+    --wait for 2*clk_period;    -- Keystream
+  --else
+    wait for clk_period;        -- Pre-output
+  --end if;
 end loop;
 
 wait;

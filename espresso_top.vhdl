@@ -9,7 +9,8 @@ entity espresso_top is
   new_key : in std_logic;
   key : in std_logic_vector (127 downto 0);
   IV  : in std_logic_vector (95 downto 0);
-  keystream : out std_logic
+  keystream : out std_logic;
+  current_state : out std_logic_vector (255 downto 0)
   );
 end entity;
 
@@ -36,7 +37,8 @@ port (
   init_FSR  : in  std_logic;
   key       : in  std_logic_vector (127 downto 0);
   IV        : in  std_logic_vector (95 downto 0);
-  keystream : out std_logic
+  keystream : out std_logic;
+  current_state : out std_logic_vector (255 downto 0)
 );
 end component espresso_datapath;
 
@@ -63,7 +65,8 @@ begin
     init_FSR  => init_FSR,
     key       => key,
     IV        => IV,
-    keystream => keystream
+    keystream => keystream,
+    current_state => current_state
   );
 
 end architecture;

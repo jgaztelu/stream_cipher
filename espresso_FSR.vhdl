@@ -11,7 +11,8 @@ entity espresso_FSR is
   ini_data  : in std_logic_vector (255 downto 0);
   z_in      : in std_logic;
   z_out     : out std_logic_vector (25 downto 0);
-  out_data  : out std_logic
+  out_data  : out std_logic;
+  current_state : out std_logic_vector (255 downto 0)
   );
 end entity;
 
@@ -83,4 +84,5 @@ z_out(2) <= shifted(213);
 z_out(1) <= shifted(181);
 z_out(0) <= shifted(174);
 out_data <= shifted(0);
+current_state <= shifted;
 end architecture;

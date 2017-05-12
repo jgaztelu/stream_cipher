@@ -10,7 +10,8 @@ entity espresso_datapath is
   init_FSR  : in std_logic;
   key       : in std_logic_vector (127 downto 0);
   IV        : in std_logic_vector (95 downto 0);
-  keystream : out std_logic
+  keystream : out std_logic;
+  current_state : out std_logic_vector (255 downto 0)
   );
 end entity;
 
@@ -26,7 +27,8 @@ architecture arch of espresso_datapath is
     ini_data : in  std_logic_vector (255 downto 0);
     z_in     : in  std_logic;
     z_out    : out std_logic_vector (25 downto 0);
-    out_data : out std_logic
+    out_data : out std_logic;
+    current_state : out std_logic_vector (255 downto 0)
   );
   end component espresso_FSR;
 
@@ -54,7 +56,8 @@ begin
     ini_data (255) =>   '0',
     z_in     => z_result,
     z_out    => z_bits,
-    out_data => open
+    out_data => open,
+    current_state => current_state
   );
 
   espresso_z_i : espresso_z

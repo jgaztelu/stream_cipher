@@ -9,12 +9,7 @@ library IEEE;
 
 package fsr_taps_type is
     type TAPS is array (0 to 31) of integer;
-    type LFSR_TAPS is array (natural range <>) of std_logic_vector (5 downto 0);
-    type NFSR_TAPS is array (natural range <>) of std_logic_vector (28 downto 0);
-    type LFSR_H is array (natural range <>) of std_logic_vector (6 downto 0);
-    type NFSR_H is array (natural range <>) of std_logic_vector (1 downto 0);
-    type LFSR_PRE is array (natural range <>) of std_logic_vector (0 downto 0);
-    type NFSR_PRE is array (natural range <>) of std_logic_vector (6 downto 0);
+    --type PARALLEL is array (natural range <>) of std_logic_vector;
 
 
 end package fsr_taps_type;

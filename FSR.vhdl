@@ -56,23 +56,25 @@ end process;
 out_data <= shifted ((r_STEP-1) downto 0);
 current_state <= shifted;
 
-
+gen_array: for J in 0 to (r_STEP-1) generate
 -- The bits defined in the r_TAPS and r_STATE arrays are connected to the outputs in the same order as they are written (left to right)
 -- Example: r_TAPS := (10,6) will create fb_out (1 downto 0) = bit10 & bit 6, in that order
 -- Connect taps in the order of r_TAPS
     gen_feedback: for I in (r_FWIDTH-1) downto 0 generate
-      fb_out(I) <= shifted(r_TAPS(r_FWIDTH-I-1));
+      fb_out(I+J*r_FWIDTH) <= shifted(r_TAPS(r_FWIDTH-I-1)+J);
     end generate gen_feedback;
 
 -- Connect output bits for h function
     gen_h: for I in (r_HWIDTH-1) downto 0 generate
-      h_out(I) <= shifted(r_STATE(r_HWIDTH-I-1));
+      h_out(I+J*r_FWIDTH) <= shifted(r_STATE(r_HWIDTH-I-1)+J);
     end generate gen_h;
 
 -- Connect output bits for the pre-output function
     gen_pre: for I in (r_PREWIDTH-1) downto 0 generate
-      pre_out(I) <= shifted(r_PRE(r_PREWIDTH-I-1));
+      pre_out(I+J*r_FWIDTH) <= shifted(r_PRE(r_PREWIDTH-I-1)+J);
     end generate gen_pre;
+
+end generate gen_array;
 
 
 

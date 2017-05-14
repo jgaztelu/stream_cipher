@@ -1,6 +1,7 @@
 library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
+  use work.fsr_taps_type.all;
 
 entity grain128a_controller is
   port (
@@ -67,7 +68,7 @@ case (current_state) is
     init_counter_next <= init_counter + 1;
     if new_key = '1' then
       next_state <= s_new_key;
-    elsif init_counter = 255 then
+    elsif init_counter = ((256/GRAIN_STEP)-1) then
       if IV0 = '1' then
         next_state <= s_auth;
       else
@@ -80,7 +81,7 @@ case (current_state) is
   when s_auth =>
     auth <= '1';
 
-    if auth_counter < 63 then
+    if auth_counter < ((64/GRAIN_STEP)-1) then
       auth_counter_next <= auth_counter + 1;
     else
       pre_64 <= '1';

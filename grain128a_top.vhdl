@@ -1,6 +1,7 @@
 library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
+  use work.fsr_taps_type.all;
 
 entity grain128a_top is
   port (
@@ -9,7 +10,7 @@ entity grain128a_top is
   new_key : in std_logic;
   key     : in std_logic_vector (127 downto 0);
   IV      : in std_logic_vector (95 downto 0);
-  stream  : out std_logic;
+  stream  : out std_logic_vector (GRAIN_STEP-1 downto 0);
   lfsr_state : out std_logic_vector (127 downto 0);
   nfsr_state : out std_logic_vector (127 downto 0)
   );
@@ -33,19 +34,20 @@ architecture arch of grain128a_top is
 
   component grain128a_datapath
   port (
-    clk      : in  std_logic;
-    rst      : in  std_logic;
-    init     : in  std_logic;
-    init_FSR : in  std_logic;
-    auth     : in  std_logic;
-    key      : in  std_logic_vector (127 downto 0);
-    IV       : in  std_logic_vector (95 downto 0);
-    pre_64   : in  std_logic;
-    stream   : out std_logic;
+    clk        : in  std_logic;
+    rst        : in  std_logic;
+    init       : in  std_logic;
+    init_FSR   : in  std_logic;
+    auth       : in  std_logic;
+    key        : in  std_logic_vector (127 downto 0);
+    IV         : in  std_logic_vector (95 downto 0);
+    pre_64     : in  std_logic;
+    stream     : out std_logic_vector (GRAIN_STEP-1 downto 0);
     lfsr_state : out std_logic_vector (127 downto 0);
     nfsr_state : out std_logic_vector (127 downto 0)
   );
   end component grain128a_datapath;
+
 
   signal  init     : std_logic;
   signal  init_FSR : std_logic;

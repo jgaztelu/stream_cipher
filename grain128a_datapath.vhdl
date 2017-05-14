@@ -14,7 +14,7 @@ entity grain128a_datapath is
   key      : in std_logic_vector (127 downto 0);
   IV       : in std_logic_vector (95 downto 0);
   pre_64   : in  std_logic;
-  stream   : out std_logic;
+  stream   : out std_logic_vector (GRAIN_STEP-1 downto 0);
   lfsr_state : out std_logic_vector (127 downto 0);
   nfsr_state : out std_logic_vector (127 downto 0)
   );
@@ -35,18 +35,19 @@ generic (
   r_PRE      : TAPS
 );
 port (
-  clk      : in  std_logic;
-  rst      : in  std_logic;
-  fb_in    : in  std_logic_vector ((r_STEP-1) downto 0);
-  init     : in  std_logic;
-  ini_data : in  std_logic_vector ((r_WIDTH-1) downto 0);
-  out_data : out std_logic_vector ((r_STEP-1) downto 0);
-  fb_out   : out std_logic_vector ((r_FWIDTH-1) downto 0);
-  h_out    : out std_logic_vector ((r_HWIDTH-1) downto 0);
-  pre_out  : out std_logic_vector ((r_PREWIDTH-1) downto 0);
+  clk           : in  std_logic;
+  rst           : in  std_logic;
+  fb_in         : in  std_logic_vector ((r_STEP-1) downto 0);
+  init          : in  std_logic;
+  ini_data      : in  std_logic_vector ((r_WIDTH-1) downto 0);
+  out_data      : out std_logic_vector ((r_STEP-1) downto 0);
+  fb_out        : out std_logic_vector ((r_FWIDTH*r_STEP-1) downto 0);
+  h_out         : out std_logic_vector ((r_HWIDTH*r_STEP-1) downto 0);
+  pre_out       : out std_logic_vector ((r_PREWIDTH*r_STEP-1) downto 0);
   current_state : out std_logic_vector ((r_WIDTH-1) downto 0)
-  );
+);
 end component FSR;
+
 
 
 component grain_nonlinear_fb
@@ -100,17 +101,17 @@ end component grain_auth;
 -- Signal declarations
 
 signal lfsr_fb_taps : std_logic_vector ((GRAIN_STEP*GRAIN_LFSR_FWIDTH-1) downto 0);   -- Feedback out of the LFSR
-signal nfsr_fb_taps : std_logic_vector (28 downto 0);                                 -- Feedback out of the NFSR
+signal nfsr_fb_taps : std_logic_vector ((GRAIN_STEP*GRAIN_NFSR_FWIDTH-1) downto 0);                                 -- Feedback out of the NFSR
 signal nfsr_fb      : std_logic_vector (GRAIN_STEP-1 downto 0);
 signal lfsr_fb      : std_logic_vector (GRAIN_STEP-1 downto 0);
 signal lfsr_out     : std_logic_vector (GRAIN_STEP-1 downto 0);
-signal h_out        : std_logic;
+signal h_out        : std_logic_vector (GRAIN_STEP-1 downto 0);
 signal nfsr_h       : std_logic_vector ((GRAIN_STEP*GRAIN_NFSR_HWIDTH-1) downto 0);
 signal lfsr_h       : std_logic_vector ((GRAIN_STEP*GRAIN_LFSR_HWIDTH-1) downto 0);
 signal nfsr_pre     : std_logic_vector ((GRAIN_STEP*GRAIN_NFSR_PREWIDTH-1) downto 0);
 signal lfsr_pre     : std_logic_vector ((GRAIN_STEP*GRAIN_LFSR_PREWIDTH-1) downto 0);
-signal pre_out      : std_logic;
-signal keystream    : std_logic;
+signal pre_out      : std_logic_vector (GRAIN_STEP-1 downto 0);
+signal keystream    : std_logic_vector (GRAIN_STEP-1 downto 0);
 
 
 begin
@@ -167,48 +168,82 @@ port map (
 );
 
 
-grain_linear_fb_i : grain_linear_fb
-port map (
-  taps_in    => lfsr_fb_taps,
-  pre_out_in => pre_out,
-  initialising       => init,
-  fb_out     => lfsr_fb (0)
-);
+--grain_linear_fb_i : grain_linear_fb
+--port map (
+--  taps_in    => lfsr_fb_taps,
+--  pre_out_in => pre_out,
+--  initialising       => init,
+--  fb_out     => lfsr_fb (0)
+--);
 
-grain_nonlinear_fb_i : grain_nonlinear_fb
-port map (
-  taps_in    => nfsr_fb_taps,
-  pre_out_in => pre_out,
-  initialising       => init,
-  lfsr_in    => lfsr_out(0),
-  fb_out     => nfsr_fb (0)
-);
+--grain_nonlinear_fb_i : grain_nonlinear_fb
+--port map (
+--  taps_in    => nfsr_fb_taps,
+--  pre_out_in => pre_out,
+--  initialising       => init,
+--  lfsr_in    => lfsr_out(0),
+--  fb_out     => nfsr_fb (0)
+--);
 
-h_function_i : h_function
-port map (
-  nfsr_in => nfsr_h,
-  lfsr_in => lfsr_h,
-  h_out   => h_out
-);
+--h_function_i : h_function
+--port map (
+--  nfsr_in => nfsr_h,
+--  lfsr_in => lfsr_h,
+--  h_out   => h_out
+--);
 
-pre_output_i : pre_output
-port map (
-  lfsr_in => lfsr_pre(0),
-  nfsr_in => nfsr_pre,
-  h_in    => h_out,
-  pre_out => pre_out
-);
+--pre_output_i : pre_output
+--port map (
+--  lfsr_in => lfsr_pre(0),
+--  nfsr_in => nfsr_pre,
+--  h_in    => h_out,
+--  pre_out => pre_out
+--);
 
-grain_auth_i : grain_auth
-port map (
-  clk        => clk,
-  rst        => rst,
-  auth       => auth,
-  pre_64     => pre_64,
-  pre_out_in => pre_out,
-  keystream  => keystream
-);
+--grain_auth_i : grain_auth
+--port map (
+--  clk        => clk,
+--  rst        => rst,
+--  auth       => auth,
+--  pre_64     => pre_64,
+--  pre_out_in => pre_out,
+--  keystream  => keystream
+--);
 
+gen_parallel: for I in 0 to GRAIN_STEP-1 generate
+  grain_linear_fb_i : grain_linear_fb
+  port map (
+    taps_in    => lfsr_fb_taps((GRAIN_LFSR_FWIDTH*(I+1) - 1) downto GRAIN_LFSR_FWIDTH*I),
+    pre_out_in => pre_out(I),
+    initialising       => init,
+    fb_out     => lfsr_fb (I)
+  );
+
+  grain_nonlinear_fb_i : grain_nonlinear_fb
+  port map (
+    taps_in    => nfsr_fb_taps((GRAIN_NFSR_FWIDTH*(I+1) - 1) downto GRAIN_NFSR_FWIDTH*I),
+    pre_out_in => pre_out(I),
+    initialising       => init,
+    lfsr_in    => lfsr_out(I),
+    fb_out     => nfsr_fb (I)
+  );
+
+  h_function_i : h_function
+  port map (
+    nfsr_in => nfsr_h((GRAIN_NFSR_HWIDTH*(I+1) - 1) downto GRAIN_NFSR_HWIDTH),
+    lfsr_in => lfsr_h((GRAIN_LFSR_HWIDTH*(I+1) - 1) downto GRAIN_LFSR_HWIDTH),
+    h_out   => h_out(I)
+  );
+
+  pre_output_i : pre_output
+  port map (
+    lfsr_in => lfsr_pre (I),
+    nfsr_in => nfsr_pre ((GRAIN_NFSR_PREWIDTH*(I+1) -1) downto GRAIN_NFSR_PREWIDTH),
+    h_in    => h_out(I),
+    pre_out => pre_out(I)
+  );
+
+end generate gen_parallel;
 
 stream <= keystream;
 

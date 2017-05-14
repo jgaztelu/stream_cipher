@@ -108,7 +108,7 @@ i := 0;
 --if IV(0) = '1' then
   --wait for 66*clk_period;     -- Key-stream with auth
 --else
-  wait for 2*clk_period;        -- Pre-output
+  wait for clk_period;        -- Pre-output
 --end if;
 while (i<=(320/GRAIN_STEP)-1) loop
   save_stream <= save_stream ((319-GRAIN_STEP) downto 0) & stream;

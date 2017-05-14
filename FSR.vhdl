@@ -66,12 +66,12 @@ gen_array: for J in 0 to (r_STEP-1) generate
 
 -- Connect output bits for h function
     gen_h: for I in (r_HWIDTH-1) downto 0 generate
-      h_out(I+J*r_FWIDTH) <= shifted(r_STATE(r_HWIDTH-I-1)+J);
+      h_out(I+J*r_HWIDTH) <= shifted(r_STATE(r_HWIDTH-I-1)+J);
     end generate gen_h;
 
 -- Connect output bits for the pre-output function
     gen_pre: for I in (r_PREWIDTH-1) downto 0 generate
-      pre_out(I+J*r_FWIDTH) <= shifted(r_PRE(r_PREWIDTH-I-1)+J);
+      pre_out(I+J*r_PREWIDTH) <= shifted(r_PRE(r_PREWIDTH-I-1)+J);
     end generate gen_pre;
 
 end generate gen_array;

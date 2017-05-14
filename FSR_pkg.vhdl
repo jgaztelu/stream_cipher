@@ -13,7 +13,7 @@ package fsr_taps_type is
   type TAPS is array (0 to 31) of integer;    -- Type used to define an array of integers which determine the feedback taps of the FSR.
 
 -- Constants for Grain cipher
-  constant GRAIN_STEP : natural range 0 to 32 := 1;       --Step size for the Grain cipher (bits/cycle). Determines the amount of parallel hardware (max 32).
+  constant GRAIN_STEP : natural range 1 to 32 := 2;       --Step size for the Grain cipher (bits/cycle). Determines the amount of parallel hardware (max 32).
 
   -- LFSR constants
   constant GRAIN_LFSR_WIDTH  : natural := 128;            -- Width of the Linear Feedback Shift Register

@@ -230,17 +230,27 @@ gen_parallel: for I in 0 to GRAIN_STEP-1 generate
 
   h_function_i : h_function
   port map (
-    nfsr_in => nfsr_h((GRAIN_NFSR_HWIDTH*(I+1) - 1) downto GRAIN_NFSR_HWIDTH),
-    lfsr_in => lfsr_h((GRAIN_LFSR_HWIDTH*(I+1) - 1) downto GRAIN_LFSR_HWIDTH),
+    nfsr_in => nfsr_h((GRAIN_NFSR_HWIDTH*(I+1) - 1) downto GRAIN_NFSR_HWIDTH*I),
+    lfsr_in => lfsr_h((GRAIN_LFSR_HWIDTH*(I+1) - 1) downto GRAIN_LFSR_HWIDTH*I),
     h_out   => h_out(I)
   );
 
   pre_output_i : pre_output
   port map (
     lfsr_in => lfsr_pre (I),
-    nfsr_in => nfsr_pre ((GRAIN_NFSR_PREWIDTH*(I+1) -1) downto GRAIN_NFSR_PREWIDTH),
+    nfsr_in => nfsr_pre ((GRAIN_NFSR_PREWIDTH*(I+1) -1) downto GRAIN_NFSR_PREWIDTH*I),
     h_in    => h_out(I),
     pre_out => pre_out(I)
+  );
+
+  grain_auth_i : grain_auth
+  port map (
+    clk        => clk,
+    rst        => rst,
+    auth       => auth,
+    pre_64     => pre_64,
+    pre_out_in => pre_out(I),
+    keystream  => keystream(I)
   );
 
 end generate gen_parallel;

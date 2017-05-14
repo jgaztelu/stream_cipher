@@ -5,9 +5,6 @@ library ieee;
 
 
 entity grain128a_datapath is
-  generic (
-  STEP  : integer := 1
-  );
   port (
   clk      : in std_logic;
   rst      : in std_logic;
@@ -102,16 +99,16 @@ end component grain_auth;
 
 -- Signal declarations
 
-signal lfsr_fb_taps : std_logic_vector (5 downto 0);
-signal nfsr_fb_taps : std_logic_vector (28 downto 0);
-signal nfsr_fb      : std_logic_vector (STEP-1 downto 0);
-signal lfsr_fb      : std_logic_vector (STEP-1 downto 0);
-signal lfsr_out     : std_logic_vector (STEP-1 downto 0);
+signal lfsr_fb_taps : std_logic_vector ((GRAIN_STEP*GRAIN_LFSR_FWIDTH-1) downto 0);   -- Feedback out of the LFSR
+signal nfsr_fb_taps : std_logic_vector (28 downto 0);                                 -- Feedback out of the NFSR
+signal nfsr_fb      : std_logic_vector (GRAIN_STEP-1 downto 0);
+signal lfsr_fb      : std_logic_vector (GRAIN_STEP-1 downto 0);
+signal lfsr_out     : std_logic_vector (GRAIN_STEP-1 downto 0);
 signal h_out        : std_logic;
-signal nfsr_h       : std_logic_vector (1 downto 0);
-signal lfsr_h       : std_logic_vector (6 downto 0);
-signal nfsr_pre     : std_logic_vector (6 downto 0);
-signal lfsr_pre     : std_logic_vector (0 downto 0);
+signal nfsr_h       : std_logic_vector ((GRAIN_STEP*GRAIN_NFSR_HWIDTH-1) downto 0);
+signal lfsr_h       : std_logic_vector ((GRAIN_STEP*GRAIN_LFSR_HWIDTH-1) downto 0);
+signal nfsr_pre     : std_logic_vector ((GRAIN_STEP*GRAIN_NFSR_PREWIDTH-1) downto 0);
+signal lfsr_pre     : std_logic_vector ((GRAIN_STEP*GRAIN_LFSR_PREWIDTH-1) downto 0);
 signal pre_out      : std_logic;
 signal keystream    : std_logic;
 
@@ -121,14 +118,14 @@ begin
 
 LFSR : FSR
 generic map (
-  r_WIDTH  => 128,
-  r_STEP   => STEP,
-  r_FWIDTH => 6,
-  r_HWIDTH => 7,
-  r_PREWIDTH => 1,
-  r_TAPS   => (96,81,70,38,7,0,others => 0), --reversed
-  r_STATE  => (8,13,20,42,60,79,94,others => 0), --reversed
-  r_PRE   =>  (93,others => 0) --reversed
+  r_WIDTH  => GRAIN_LFSR_WIDTH,
+  r_STEP   => GRAIN_STEP,
+  r_FWIDTH => GRAIN_LFSR_FWIDTH,
+  r_HWIDTH => GRAIN_LFSR_HWIDTH,
+  r_PREWIDTH => GRAIN_LFSR_PREWIDTH,
+  r_TAPS   => GRAIN_LFSR_TAPS,
+  r_STATE  => GRAIN_LFSR_STATE,
+  r_PRE   =>  GRAIN_LFSR_PRE
 )
 port map (
   clk      => clk,
@@ -147,14 +144,14 @@ port map (
 
 NFSR : FSR
 generic map (
-  r_WIDTH  => 128,
-  r_STEP   => STEP,
-  r_FWIDTH => 29,
-  r_HWIDTH => 2,
-  r_PREWIDTH => 7,
-  r_TAPS   => (96,91,56,26,0,84,68,67,3,65,61,59,27,48,40,18,17,13,11,82,78,70,25,24,22,95,93,92,88,others => 0),--reversed
-  r_STATE  => (12,95,others => 0),--reversed
-  r_PRE   =>  (2,15,36,45,64,73,89,others => 0) --reversed
+  r_WIDTH  => GRAIN_NFSR_WIDTH,
+  r_STEP   => GRAIN_STEP,
+  r_FWIDTH => GRAIN_NFSR_FWIDTH,
+  r_HWIDTH => GRAIN_NFSR_HWIDTH,
+  r_PREWIDTH => GRAIN_NFSR_PREWIDTH,
+  r_TAPS   => GRAIN_NFSR_TAPS,--reversed
+  r_STATE  => GRAIN_NFSR_STATE,--reversed
+  r_PRE   =>  GRAIN_NFSR_PRE --reversed
 )
 port map (
   clk      => clk,

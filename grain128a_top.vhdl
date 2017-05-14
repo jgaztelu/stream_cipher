@@ -32,9 +32,6 @@ architecture arch of grain128a_top is
   end component grain128a_controller;
 
   component grain128a_datapath
-  generic (
-    STEP : integer := 1
-  );
   port (
     clk      : in  std_logic;
     rst      : in  std_logic;
@@ -70,9 +67,6 @@ begin
   );
 
   grain128a_datapath_i : grain128a_datapath
-  generic map (
-    STEP => 1
-  )
   port map (
     clk      => clk,
     rst      => rst,

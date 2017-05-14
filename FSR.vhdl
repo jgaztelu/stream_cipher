@@ -22,14 +22,17 @@ library ieee;
     init     : in std_logic;
     ini_data : in std_logic_vector ((r_WIDTH-1) downto 0);
     out_data : out std_logic_vector ((r_STEP-1) downto 0);
-    fb_out   : out std_logic_vector ((r_FWIDTH-1) downto 0);
-    h_out    : out std_logic_vector ((r_HWIDTH-1) downto 0);
-    pre_out  : out std_logic_vector ((r_PREWIDTH-1) downto 0);
+    fb_out   : out std_logic_vector ((r_FWIDTH*r_STEP-1) downto 0);
+    h_out    : out std_logic_vector ((r_HWIDTH*r_STEP-1) downto 0);
+    pre_out  : out std_logic_vector ((r_PREWIDTH*r_STEP-1) downto 0);
     current_state : out std_logic_vector ((r_WIDTH-1) downto 0)
     );
   end entity;
 
 architecture behavioural of FSR is
+
+
+
 signal shifted,shifted_next  : std_logic_vector((r_WIDTH-1) downto 0);
 begin
 process(clk,rst)
@@ -53,25 +56,24 @@ end process;
 out_data <= shifted ((r_STEP-1) downto 0);
 current_state <= shifted;
 
---gen_step : for J in 0 to r_STEP-1 generate
 
 -- The bits defined in the r_TAPS and r_STATE arrays are connected to the outputs in the same order as they are written (left to right)
 -- Example: r_TAPS := (10,6) will create fb_out (1 downto 0) = bit10 & bit 6, in that order
 -- Connect taps in the order of r_TAPS
     gen_feedback: for I in (r_FWIDTH-1) downto 0 generate
-      fb_out(I) <= shifted(r_TAPS(r_FWIDTH-I-1)+ J);
+      fb_out(I) <= shifted(r_TAPS(r_FWIDTH-I-1));
     end generate gen_feedback;
 
 -- Connect output bits for h function
     gen_h: for I in (r_HWIDTH-1) downto 0 generate
-      h_out(I) <= shifted(r_STATE(r_HWIDTH-I-1)+ J);
+      h_out(I) <= shifted(r_STATE(r_HWIDTH-I-1));
     end generate gen_h;
 
 -- Connect output bits for the pre-output function
     gen_pre: for I in (r_PREWIDTH-1) downto 0 generate
-      pre_out(I) <= shifted(r_PRE(r_PREWIDTH-I-1)+ J);
+      pre_out(I) <= shifted(r_PRE(r_PREWIDTH-I-1));
     end generate gen_pre;
 
-  --end generate gen_step;
+
 
 end architecture;

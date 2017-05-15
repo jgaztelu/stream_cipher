@@ -48,7 +48,7 @@ signal row_counter : integer:=0;
 shared variable row         : line;
 shared variable row_data    : std_logic_vector(127 downto 0);
 
-signal loop_end		: std_logic;
+signal save_end		: std_logic;
 
 
 --file input_data : text open read_mode is "/h/d7/w/ja8602ga-s/Crypto/grain_state.txt";
@@ -69,23 +69,15 @@ begin
   new_key <= '1';
   wait for 1.5*clk_period;
   rst <= '0';
-  new_key <= '1';
-  key <= (others => '0');
-  IV <= (others => '0');
-  --IV (95 downto 4) <= (others => '0');
-  --IV (3 downto 0) <= "0001";
-  wait for clk_period;
-  new_key <= '0';
-  wait for clk_period;
-  while loop_end = '0' loop
-  wait for clk_period;
+  for J in 0 to 1 loop
+	  new_key <= '1';
+	  key <= (others => '0');
+	  IV <= (others => '0');
+	  wait for clk_period;
+	  new_key <= '0';
+	  wait until save_end = '1';
   end loop;
-  new_key <= '1';
-  key <= (others => '0');
-  IV <= (others => '0');
-  wait for 1.5*clk_period;
-  new_key <= '0';
-  wait;
+wait;
 end process;
 
 save_stream_proc : process
@@ -94,69 +86,40 @@ begin
   i:=0;
   i_sig <= i;
   save_stream <= (others => '0');
-  loop_end <= '0';
-while rst = '1' loop
-end loop;
-wait for 4*clk_period;
-while (i<(256/GRAIN_STEP)-1) loop
-  loop_end <= '0';
-  i := i+1;
-  i_sig <= i;
-  wait for clk_period;
-end loop;
-i := 0;
---if IV(0) = '1' then
-  --wait for 66*clk_period;     -- Key-stream with auth
---else
-  wait for clk_period;        -- Pre-output
---end if;
-while (i<=(320/GRAIN_STEP)-1) loop
-  save_stream <= save_stream ((319-GRAIN_STEP) downto 0) & stream;
-  i := i+1;
-  i_sig <= i;
-  --if IV(0) = '1' then
-    --wait for 2*clk_period;    -- Keystream
-  --else
-    wait for clk_period;        -- Pre-output
-  --end if;
-end loop;
-
-loop_end <= '1';
-wait for clk_period;
-while new_key = '1' loop
- i:= 0;
- i_sig <= i;
- wait for clk_period;
-end loop;
-wait for clk_period;
-
---LOOP 2
-
-while (i<255) loop
-  loop_end <= '0';
-  i := i+1;
-  i_sig <= i;
-  wait for clk_period;
-end loop;
-i:=0;
-save_stream <= (others => '0');
---if IV(0) = '1' then
-  --wait for 66*clk_period;     -- Key-stream with auth
---else
-  wait for clk_period;        -- Pre-output
---end if;
-while (i<=320) loop
-  save_stream <= save_stream ((319-GRAIN_STEP) downto 0) & stream;
-  i := i+1;
-  i_sig <= i;
-  --if IV(0) = '1' then
-    --wait for 2*clk_period;    -- Keystream
-  --else
-    wait for clk_period;        -- Pre-output
-  --end if;
+  save_end <= '0';
+wait until rst = '0';
+for L in 0 to 1 loop
+	i:=0;
+	wait until new_key = '0';
+	wait for 3*clk_period;
+	while (i<(256/GRAIN_STEP)-1) loop	-- Wait initialisation rounds
+	  save_end <= '0';
+	  i := i+1;
+	  i_sig <= i;
+	  wait for clk_period;
+	end loop;
+	i := 0;
+	--if IV(0) = '1' then
+	  wait for 66*clk_period;         -- Key-stream with auth
+	--else
+	  --wait for 2*clk_period;        -- Key-stream without auth (Pre-output)
+	--end if;
+	while (i<=(320/GRAIN_STEP)-2) loop
+	  save_stream <= save_stream ((319-GRAIN_STEP) downto 0) & stream;
+	  i := i+1;
+	  i_sig <= i;
+	  --if IV(0) = '1' then
+	    wait for 2*clk_period;    -- Key-stream with auth
+	  --else
+	    --wait for clk_period;        -- Key-stream without auth (Pre-output)
+	  --end if;
+	end loop;
+	save_end <= '1';
+	wait for clk_period;
+	save_end <= '0';
+	save_stream <= (others => '0');
 end loop;
 
-wait;
 end process;
 
 --file_process: process

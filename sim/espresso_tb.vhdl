@@ -86,7 +86,7 @@ save_stream_proc : process
   end loop;
   i := 0;
   wait for clk_period;
-  while (i<=159) loop
+  while (i<=175) loop
     save_stream <= save_stream (158 downto 0) & keystream;
     save_stream1 <= keystream & save_stream1 (159 downto 1);
     i := i+1;

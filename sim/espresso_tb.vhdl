@@ -1,8 +1,9 @@
 library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
-  use ieee.std_logic_textio.all;
   use std.textio.all;
+  use ieee.std_logic_textio.all;
+  
 
 entity espresso_tb is
 end entity;
@@ -31,16 +32,18 @@ signal IV        : std_logic_vector (95 downto 0);
 signal keystream : std_logic;
 
 signal save_stream  : std_logic_vector (159 downto 0);
-signal espresso_state : std_logic_vector (255 downto 0);
+signal save_stream1  : std_logic_vector (159 downto 0);
+signal espresso_state : std_logic_vector (127 downto 0);
 signal current_state  : std_logic_vector (255 downto 0);
 signal espresso_error : std_logic;
 
 shared variable i :  integer range 0 to 1024;
 signal row_counter : integer:=0;
 shared variable row         : line;
-shared variable row_data    : std_logic_vector(255 downto 0);
+shared variable row_data    : std_logic_vector(127 downto 0);
 
 file input_data : text open read_mode is "/h/d7/w/ja8602ga-s/Crypto/espresso_state.txt";
+
 begin
 
   clock_gen : process
@@ -73,6 +76,7 @@ save_stream_proc : process
   begin
     i:=0;
     save_stream <= (others => '0');
+    save_stream1 <= (others => '0');
   while rst = '1' loop
   end loop;
   wait for 5*clk_period;
@@ -82,31 +86,32 @@ save_stream_proc : process
   end loop;
   i := 0;
   wait for clk_period;
-  while (i<=255) loop
+  while (i<=159) loop
     save_stream <= save_stream (158 downto 0) & keystream;
+    save_stream1 <= keystream & save_stream1 (159 downto 1);
     i := i+1;
     wait for clk_period;
   end loop;
   wait;
   end process;
 
-file_process: process
+file_proc: process
 begin
-    row_counter <= 0;
-    wait for 4*clk_period;
-    while not endfile(input_data) and row_counter < 256 loop
-        readline(input_data,row);
-        read (row,row_data);
-	current_state <= row_data;
-	row_counter <= row_counter + 1;
-	wait for clk_period;
-    end loop;
-    wait;
+  row_counter <= 0;
+  wait for 4*clk_period;
+  while (not endfile(input_data) and row_counter < 256) loop
+    readline(input_data,row);
+    read(row,row_data);
+    espresso_state <= row_data;
+    row_counter <= row_counter+1;
+    wait for clk_period;
+  end loop;
+  wait;
 end process;
 
 check_process: process
 begin
- if current_state = espresso_state then
+ if current_state (255 downto 128) = espresso_state then
     espresso_error <= '0';
  else
     espresso_error <= '1';

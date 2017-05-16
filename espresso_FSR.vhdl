@@ -43,7 +43,7 @@ end process;
       shifted_next (235) <= shifted (236) xor (shifted(67) and shifted(90) and shifted(110) and shifted(137));
       shifted_next (231) <= shifted (232) xor (shifted(50) and shifted(159)) xor shifted(189);
       shifted_next (217) <= shifted (218) xor (shifted(3) and shifted(32));
-      shifted_next (213) <= shifted (214) xor (shifted(4) and shifted(5));
+      shifted_next (213) <= shifted (214) xor (shifted(4) and shifted(45));
       shifted_next (209) <= shifted (210) xor (shifted(6) and shifted(64));
       shifted_next (205) <= shifted (206) xor (shifted(5) and shifted(80));
       shifted_next (201) <= shifted (202) xor (shifted(8) and shifted(103));

@@ -46,7 +46,7 @@ end process;
 
 process (fb_in,init,ini_data,shifted)
 begin
-  shifted_next <= shifted;
+ -- shifted_next <= shifted;
   if init = '1' then
     shifted_next <= ini_data;
   else

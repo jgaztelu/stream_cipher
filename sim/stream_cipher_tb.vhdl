@@ -27,6 +27,8 @@ signal espresso_out : std_logic;
 
 signal key	:	std_logic_vector (127 downto 0) := (others => '0');
 signal IV	:	std_logic_vector (95 downto 0) := x"800000000000000000000000";
+signal save_grain : std_logic_vector (319 downto 0);
+shared variable i :  integer range 0 to 1024;
 
 constant clk_period : time := 5 ns;
 
@@ -54,20 +56,45 @@ begin
 	new_key <= '0';
 	data_in <= '0';
 	wait until rst = '0';
-	for I in 0 to 127 loop
-		WEB <= '1';
-		data_in <= key(I);
-		wait for clk_period;
-	end loop;
+
 	for I in 0 to 95 loop
 		WEB <= '1';
 		data_in <= IV(I);
 		wait for clk_period;
 	end loop;
+
+	for I in 0 to 127 loop
+		WEB <= '1';
+		data_in <= key(I);
+		wait for clk_period;
+	end loop;
+
 	WEB <='0';
 	new_key <= '1';
 	wait for clk_period;
 	new_key <= '0';
+	wait;
+end process;
+
+savegrainproc: process
+begin
+	wait until new_key = '0';
+	save_grain <= (others => '0');
+	wait until new_key = '1';
+	wait until new_key = '0';
+	
+	wait for 3*clk_period;
+	while (i<(256/GRAIN_STEP)-1) loop	-- Wait initialisation rounds
+	  i := i+1;
+	  wait for clk_period;
+	end loop;
+	i:=0;
+	wait for 66*clk_period;         
+	while (i<=(320/GRAIN_STEP)-1) loop
+	  save_grain <= save_grain ((319-GRAIN_STEP) downto 0) & grain128a_out;
+	  i := i+1;
+	  wait for 2*clk_period;    -- Key-stream with auth
+	end loop;
 	wait;
 end process;
 

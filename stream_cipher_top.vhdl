@@ -8,8 +8,9 @@ entity stream_cipher_top is
   clk : in std_logic;
   rst : in std_logic;
   new_key : in std_logic;
-  key : in std_logic_vector (127 downto 0);
-  IV  : in std_logic_vector (95 downto 0);
+  data_in : in std_logic;
+  WEB	  : in std_logic;
+  reg_full : out std_logic;
   grain128a_out : out std_logic_vector (GRAIN_STEP-1 downto 0);
   espresso_out : out std_logic
    );
@@ -42,6 +43,21 @@ component espresso_top is
   );
 end component;
 
+component input_register is
+  port (
+  clk          : in std_logic;
+  rst          : in std_logic;
+  WEB          : in std_logic; -- Write enable
+  data_in      : in std_logic;
+  new_key	: in std_logic;
+  reg_full	: out std_logic;
+  key     	: out std_logic_vector (127 downto 0);
+  IV		: out std_logic_vector(95 downto 0)
+  );
+end component;
+
+signal key : std_logic_vector (127 downto 0);
+signal IV : std_logic_vector (95 downto 0);
 begin
 
 grain128a_i: grain128a_top 
@@ -65,6 +81,18 @@ port map (
   IV => IV,
   keystream => espresso_out,
   current_state => open
+  );
+
+input_register_i: input_register
+port map (
+  clk => clk,
+  rst => rst,
+  WEB => WEB,
+  data_in => data_in,
+  new_key => new_key,
+  reg_full => reg_full,
+  key =>  key,
+  IV => IV
   );
 
 end architecture;

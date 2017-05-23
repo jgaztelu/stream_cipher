@@ -10,31 +10,35 @@ entity input_register is
   data_in      : in std_logic;
   new_key	: in std_logic;
   reg_full	: out std_logic;
-  data_out     : out std_logic_vector (223 downto 0)
+  key     	: out std_logic_vector (127 downto 0);
+  IV		: out std_logic_vector(95 downto 0)
   );
 end entity;
 
 architecture behavioural of input_register is
-
-begin
 signal shifted_in,shifted_in_next : std_logic_vector (223 downto 0);
 signal in_counter,in_counter_next : unsigned (7 downto 0);
+
+begin
+
 process (clk,rst)
 begin
   if rst = '1' then
 	shifted_in <= (others => '0');
 	in_counter <= (others => '0');
   elsif clk'event and clk='1' then
-	shfited_in <= shifted_in_next;
+	shifted_in <= shifted_in_next;
 	in_counter <= in_counter_next;
   end if;
 end process;
 
-process (WEB,data_in,shifted)
+process (WEB,data_in,shifted_in,in_counter)
 begin
+  shifted_in_next <= shifted_in;
+  in_counter_next <= in_counter;
   if WEB = '1' then
 	in_counter_next <= in_counter + 1;
-	shifted_next <= shifted(222 downto 0) & data_in;
+	shifted_in_next <= shifted_in(222 downto 0) & data_in;
   elsif new_key = '1' then
 	in_counter_next <= (others => '0');
   else
@@ -48,7 +52,10 @@ begin
   end if;
 end process;
 
-data_out <= shifted_in;
+key <= shifted_in(127 downto 0);
+IV <= shifted_in (223 downto 128);
+
+end architecture;
  
   
 	

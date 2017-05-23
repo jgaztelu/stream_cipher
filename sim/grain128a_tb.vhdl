@@ -31,15 +31,9 @@ signal rst     : std_logic;
 signal new_key : std_logic;
 signal key     : std_logic_vector (127 downto 0);
 signal IV      : std_logic_vector (95 downto 0);
-<<<<<<< HEAD
 signal stream  : std_logic_vector (GRAIN_STEP-1 downto 0);
 signal save_stream  : std_logic_vector (319 downto 0);
 signal lfsr_state : std_logic_vector (127 downto 0);
-=======
-signal stream  : std_logic;
-signal save_stream  : std_logic_vector (255 downto 0);
-signal lfsr_state : std_logic_vector (127 downto 0);  
->>>>>>> espresso
 signal nfsr_state : std_logic_vector (127 downto 0);
 
 signal lfsr_out : std_logic_vector (127 downto 0);
@@ -72,7 +66,6 @@ end process;
 stim_process : process
 begin
   rst <= '1';
-<<<<<<< HEAD
   new_key <= '1';
   wait for 1.5*clk_period;
   rst <= '0';
@@ -85,19 +78,6 @@ begin
 	  wait until save_end = '1';
   end loop;
 wait;
-=======
-  new_key <= '1';
-  wait for 1.5*clk_period;
-  rst <= '0';
-  new_key <= '1';
-  key <= (others => '1');
-  IV <= (others => '1');
-  --IV (95 downto 4) <= (others => '0');
-  --IV (3 downto 0) <= "0001";
-  wait for clk_period;
-  new_key <= '0';
-  wait;
->>>>>>> espresso
 end process;
 
 save_stream_proc : process
@@ -106,7 +86,6 @@ begin
   i:=0;
   i_sig <= i;
   save_stream <= (others => '0');
-<<<<<<< HEAD
   save_end <= '0';
 wait until rst = '0';
 for L in 0 to 1 loop
@@ -139,29 +118,7 @@ for L in 0 to 1 loop
 	wait for clk_period;
 	save_end <= '0';
 	save_stream <= (others => '0');
-=======
-while rst = '1' loop
-end loop;
-wait for 4*clk_period;
-while (i<255) loop
-  i := i+1;
-  wait for clk_period;
-end loop;
-i := 0;
---if IV(0) = '1' then
-  --wait for 66*clk_period;     -- Key-stream with auth
---else
-  wait for 2*clk_period;        -- Pre-output
---end if;
-while (i<=255) loop
-  save_stream <= save_stream (254 downto 0) & stream;
-  i := i+1;
-  --if IV(0) = '1' then  
-    --wait for 2*clk_period;    -- Keystream
-  --else
-    wait for clk_period;        -- Pre-output
-  --end if;
->>>>>>> espresso
+	
 end loop;
 
 end process;

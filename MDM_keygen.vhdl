@@ -22,8 +22,8 @@ signal key_sig, key_sig_next             : std_logic_vector (127 downto 0);
 signal IV_sig, IV_sig_next               : std_logic_vector (95 downto 0);
 signal comb_counter, comb_counter_next   : unsigned (59 downto 0);
 signal assigned_bits, assigned_bits_next : integer range 0 to 59;
-signal key_loop_counter, key_loop_counter_next   : integer range 0 to 127;
-signal IV_loop_counter, IV_loop_counter_next     : integer range 0 to 95;
+signal key_loop_counter, key_loop_counter_next   : integer range 0 to 128;
+signal IV_loop_counter, IV_loop_counter_next     : integer range 0 to 96;
 
 
 begin

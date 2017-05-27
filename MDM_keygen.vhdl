@@ -10,10 +10,12 @@ entity MDM_keygen is
     IV_in            : in std_logic_vector (95 downto 0);
     key_mask         : in std_logic_vector (127 downto 0);
     IV_mask          : in std_logic_vector (95 downto 0);
-    comb_counter_max : in unsigned (6 downto 0);
+    comb_counter_max : in unsigned (59 downto 0);
     new_comb         : in std_logic;
     key_masked       : out std_logic_vector (127 downto 0);
-    IV_masked        : out std_logic_vector (95 downto 0)
+    IV_masked        : out std_logic_vector (95 downto 0);
+    mask_ready       : out std_logic;
+    comb_finished    : out std_logic
   );
 end entity;
 
@@ -46,7 +48,7 @@ begin
   end if;
 end process;
 
-key_iv_proc: process (key_in,key_mask,IV_in,IV_mask,comb_counter,key_sig,IV_sig,assigned_bits,key_loop_counter,IV_loop_counter)
+key_iv_proc: process (key_in,key_mask,IV_in,IV_mask,comb_counter,key_sig,IV_sig,assigned_bits,key_loop_counter,IV_loop_counter,new_comb)
 
 begin
 key_sig_next <= key_sig;
@@ -54,8 +56,13 @@ IV_sig_next  <= IV_sig;
 assigned_bits_next <= assigned_bits;
 key_loop_counter_next <= key_loop_counter;
 IV_loop_counter_next <= IV_loop_counter;
+mask_ready <= '0';
 
-  if key_loop_counter < 128 then
+  if new_comb = '1' then
+    key_loop_counter_next <= 0;
+    IV_loop_counter_next  <= 0;
+    assigned_bits_next <= 0;
+  elsif key_loop_counter <= 127 then
     if key_mask (key_loop_counter) = '1' then
       key_sig_next (key_loop_counter) <= comb_counter (assigned_bits);
       assigned_bits_next <= assigned_bits + 1;
@@ -63,7 +70,7 @@ IV_loop_counter_next <= IV_loop_counter;
       key_sig_next (key_loop_counter) <= key_in (key_loop_counter);
     end if;
     key_loop_counter_next <= key_loop_counter + 1;
-  elsif IV_loop_counter < 96 then
+  elsif IV_loop_counter <= 95 then
     if IV_mask(IV_loop_counter) = '1' then
       IV_sig_next(IV_loop_counter) <= comb_counter (assigned_bits);
       assigned_bits_next <= assigned_bits + 1;
@@ -71,7 +78,9 @@ IV_loop_counter_next <= IV_loop_counter;
       IV_sig_next (IV_loop_counter) <= IV_in (IV_loop_counter);
     end if;
     IV_loop_counter_next <= IV_loop_counter + 1;
-  end if;
+else
+  mask_ready <= '1';
+end if;
 end process;
 
 comb_counter_proc:  process (comb_counter,comb_counter_max,new_comb)
@@ -80,6 +89,12 @@ begin
     comb_counter_next <= comb_counter + 1;
   else
     comb_counter_next <= comb_counter;
+  end if;
+
+  if comb_counter > comb_counter_max then
+    comb_finished <= '1';
+  else
+    comb_finished <= '0';
   end if;
 end process;
 

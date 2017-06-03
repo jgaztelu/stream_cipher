@@ -47,10 +47,11 @@ begin
 	shifted_in_next <= shifted_in;
 	prev_signature_next <= prev_signature;
 	signature_valid <= '0';
-	
+
 	if load_signature = '1' then
 		prev_signature_next <= signature_in;
-	else	
+    next_state <= idle;
+	else
 		case current_state is
 			when idle =>
 				if grain_init = '1' then
@@ -58,21 +59,21 @@ begin
 				else
 					next_state <= idle;
 				end if;
-	
+
 			when store =>
 				shifted_in_next <= shifted_in (255-GRAIN_STEP downto 0) & grain_in;
 				if grain_init = '1' then
 					next_state <= store;
 				else
 					next_state <= acc_sign;
+          prev_signature_next <= prev_signature xor shifted_in;
 				end if;
-		
+
 			when acc_sign =>
-				prev_signature_next <= prev_signature xor shifted_in;
 				signature_valid <= '1';
 				next_state <= idle;
 		end case;
-
+  end if;
 end process;
-
+grain_signature <= prev_signature;
 end architecture;

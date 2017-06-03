@@ -18,7 +18,7 @@ entity MDM_controller is
 end entity;
 
 architecture arch of MDM_controller is
-type state_type is (idle,wait_mask,signature,bypass)
+type state_type is (idle,wait_mask,signature);
 signal current_state, next_state : state_type;
 begin
 
@@ -57,7 +57,11 @@ begin
 
     when signature =>
       if signature_valid = '1' then
-        next_state <= wait_mask;
+        if comb_finished = '1' then
+          next_state <= idle;
+        else
+          next_state <= wait_mask;
+        end if;
       else
         next_state <= signature;
       end if;

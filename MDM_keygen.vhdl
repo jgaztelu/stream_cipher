@@ -64,6 +64,8 @@ assigned_bits_next <= assigned_bits;
 key_loop_counter_next <= key_loop_counter;
 IV_loop_counter_next <= IV_loop_counter;
 mask_ready <= '0';
+key_out_next  <= key_out;
+IV_out_next   <= IV_out;
 
   if new_comb = '1' then
     key_loop_counter_next <= 0;

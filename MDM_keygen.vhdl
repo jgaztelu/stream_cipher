@@ -55,7 +55,7 @@ begin
   end if;
 end process;
 
-key_iv_proc: process (key_in,key_mask,IV_in,IV_mask,comb_counter,key_sig,IV_sig,assigned_bits,key_loop_counter,IV_loop_counter,new_comb)
+key_iv_proc: process (key_in,key_mask,IV_in,IV_mask,comb_counter,key_sig,IV_sig,assigned_bits,key_loop_counter,IV_loop_counter,new_comb,key_out,IV_out)
 
 begin
 key_sig_next <= key_sig;

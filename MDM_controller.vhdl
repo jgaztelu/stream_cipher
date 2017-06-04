@@ -56,6 +56,7 @@ begin
       end if;
 
     when signature =>
+
       if signature_valid = '1' then
         if comb_finished = '1' then
           next_state <= idle;

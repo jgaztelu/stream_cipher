@@ -8,25 +8,30 @@ end entity;
 
 architecture testbench of stream_cipher_tb is
 
-component stream_cipher_top_p is
+  component stream_cipher_top
   port (
-  clk : in std_logic;
-  rst : in std_logic;
-  new_key : in std_logic;
-  data_in : in std_logic;
-  WEB	  : in std_logic;
-  reg_full : out std_logic;
-  grain128a_out : out std_logic_vector (GRAIN_STEP-1 downto 0);
-  espresso_out : out std_logic
-   );
-end component;
+    clk           : in  std_logic;
+    rst           : in  std_logic;
+    start_attack  : in  std_logic;
+    new_key       : in  std_logic;
+    key_in        : in  std_logic;
+    mask_in       : in  std_logic;
+    WEB           : in  std_logic;
+    reg_full      : out std_logic;
+    grain128a_out : out std_logic_vector (GRAIN_STEP-1 downto 0);
+    espresso_out  : out std_logic
+  );
+  end component stream_cipher_top;
 
-signal clk,rst,new_key,data_in,WEB,reg_full : std_logic;
+
+signal clk,rst,start_attack,new_key,key_in,mask_in,WEB,reg_full : std_logic;
 signal grain128a_out : std_logic_vector (GRAIN_STEP-1 downto 0);
 signal espresso_out : std_logic;
 
 signal key	:	std_logic_vector (127 downto 0) := (others => '0');
-signal IV	:	std_logic_vector (95 downto 0) := x"800000000000000000000000";
+signal IV	:	std_logic_vector (95 downto 0) := (others => '0');
+signal key_mask : std_logic_vector (127 downto 0);
+signal IV_mask  : std_logic_vector (95 downto 0);
 signal save_grain : std_logic_vector (319 downto 0);
 shared variable i :  integer range 0 to 1024;
 
@@ -54,25 +59,31 @@ datainproc: process
 begin
 	WEB <= '0';
 	new_key <= '0';
-	data_in <= '0';
+	key_in <= '0';
+  mask_in <= '0';
+  start_attack <= '0';
+  key_mask <= (23 => '1', others => '0');
+  IV_mask <= (47 => '1',53 => '1', 58 => '1', 64 => '1', others => '0');
 	wait until rst = '0';
 
 	for I in 0 to 95 loop
 		WEB <= '1';
-		data_in <= IV(I);
+		key_in <= IV(I);
+    mask_in <= IV_mask (I);
 		wait for clk_period;
 	end loop;
 
 	for I in 0 to 127 loop
 		WEB <= '1';
-		data_in <= key(I);
+		key_in <= key(I);
+    mask_in <= key_mask (I);
 		wait for clk_period;
 	end loop;
 
 	WEB <='0';
-	new_key <= '1';
+	start_attack <= '1';
 	wait for clk_period;
-	new_key <= '0';
+	start_attack <= '0';
 	wait;
 end process;
 
@@ -82,14 +93,14 @@ begin
 	save_grain <= (others => '0');
 	wait until new_key = '1';
 	wait until new_key = '0';
-	
+
 	wait for 3*clk_period;
 	while (i<(256/GRAIN_STEP)-1) loop	-- Wait initialisation rounds
 	  i := i+1;
 	  wait for clk_period;
 	end loop;
 	i:=0;
-	wait for 66*clk_period;         
+	wait for 66*clk_period;
 	while (i<=(320/GRAIN_STEP)-1) loop
 	  save_grain <= save_grain ((319-GRAIN_STEP) downto 0) & grain128a_out;
 	  i := i+1;
@@ -98,18 +109,19 @@ begin
 	wait;
 end process;
 
-uut: stream_cipher_top_p
-	port map (
-		clk => clk,
-		rst => rst,
-		new_key => new_key,
-		data_in => data_in,
-		WEB => WEB,
-		reg_full => reg_full,
-		grain128a_out => grain128a_out,
-		espresso_out => espresso_out
-		);
+uut : stream_cipher_top
+port map (
+  clk           => clk,
+  rst           => rst,
+  start_attack  => start_attack,
+  new_key       => new_key,
+  key_in        => key_in,
+  mask_in       => mask_in,
+  WEB           => WEB,
+  reg_full      => reg_full,
+  grain128a_out => grain128a_out,
+  espresso_out  => espresso_out
+);
+
 
 end architecture;
-	
-	

@@ -29,7 +29,7 @@ begin
   end if;
 end process;
 
-  combinational : process(shifted,init,ini_data,z_in)
+  combinational : process(shifted,init,ini_data,z_in,init_FSR)
   begin
     if init_FSR = '1' then
       shifted_next <= ini_data;

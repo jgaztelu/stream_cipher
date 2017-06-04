@@ -55,7 +55,7 @@ begin
   end if;
 end process;
 
-key_iv_proc: process (key_in,key_mask,IV_in,IV_mask,comb_counter,key_sig,IV_sig,assigned_bits,key_loop_counter,IV_loop_counter,new_comb,key_out,IV_out)
+key_iv_proc: process (key_in,key_mask,IV_in,IV_mask,comb_counter,key_sig,IV_sig,assigned_bits,key_loop_counter,IV_loop_counter,new_comb,key_out,IV_out,clr_counter)
 
 begin
 key_sig_next <= key_sig;
@@ -67,12 +67,13 @@ mask_ready <= '0';
 key_out_next  <= key_out;
 IV_out_next   <= IV_out;
 
-  if new_comb = '1' then
+  if (new_comb = '1' or clr_counter = '1') then
     key_loop_counter_next <= 0;
     IV_loop_counter_next  <= 0;
     assigned_bits_next <= 0;
     key_out_next <= key_sig;      -- Save generated key/IV in the output register. This allows to compute the next key/IV  while the previous is in use,
     IV_out_next <= IV_sig;
+
   elsif key_loop_counter <= 127 then
     if key_mask (key_loop_counter) = '1' then
       key_sig_next (key_loop_counter) <= comb_counter (assigned_bits);
@@ -89,13 +90,15 @@ IV_out_next   <= IV_out;
       IV_sig_next (IV_loop_counter) <= IV_in (IV_loop_counter);
     end if;
     IV_loop_counter_next <= IV_loop_counter + 1;
-else
-  mask_ready <= '1';
-
-end if;
+  end if;
+  if IV_loop_counter > 95 then
+    mask_ready <= '1';
+  else
+    mask_ready <= '0';
+  end if;
 end process;
 
-comb_counter_proc:  process (comb_counter,comb_counter_max,new_comb)
+comb_counter_proc:  process (comb_counter,comb_counter_max,new_comb, clr_counter)
 begin
   if (new_comb = '1' and comb_counter < comb_counter_max) then
     comb_counter_next <= comb_counter + 1;

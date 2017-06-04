@@ -5,12 +5,13 @@ library ieee;
 
 entity grain128a_top is
   port (
-  clk     : in std_logic;
-  rst     : in std_logic;
-  new_key : in std_logic;
-  key     : in std_logic_vector (127 downto 0);
-  IV      : in std_logic_vector (95 downto 0);
-  stream  : out std_logic_vector (GRAIN_STEP-1 downto 0);
+  clk        : in std_logic;
+  rst        : in std_logic;
+  new_key    : in std_logic;
+  key        : in std_logic_vector (127 downto 0);
+  IV         : in std_logic_vector (95 downto 0);
+  stream     : out std_logic_vector (GRAIN_STEP-1 downto 0);
+  initial    : out std_logic;
   lfsr_state : out std_logic_vector (127 downto 0);
   nfsr_state : out std_logic_vector (127 downto 0)
   );
@@ -83,4 +84,5 @@ begin
     nfsr_state => nfsr_state
   );
 
+initial <= init;
 end architecture;

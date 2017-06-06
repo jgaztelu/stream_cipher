@@ -13,7 +13,8 @@ entity MDM_controller is
   clr_comb_counter : out std_logic;
   new_comb         : out std_logic;
   new_key          : out std_logic;
-  load_signature   : out std_logic
+  load_signature   : out std_logic;
+  store			   : out std_logic
   );
 end entity;
 
@@ -36,6 +37,7 @@ begin
   clr_comb_counter <= '0';
   new_comb <= '0';
   new_key <= '0';
+  store <= '0';
   load_signature <= '0';
   case current_state is
     when idle =>
@@ -57,7 +59,7 @@ begin
 
 
     when signature =>
-
+	  store <= '1';
       if signature_valid = '1' then
         if comb_finished = '1' then
           next_state <= idle;

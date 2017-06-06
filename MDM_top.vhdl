@@ -51,6 +51,7 @@ architecture structural of MDM_top is
     grain_init      : in  std_logic;
     signature_in    : in  std_logic_vector (255 downto 0);
     load_signature  : in  std_logic;
+	store_enable	: in  std_logic;
     signature_valid : out std_logic;
     grain_signature : out std_logic_vector (255 downto 0)
   );
@@ -67,7 +68,8 @@ architecture structural of MDM_top is
     clr_comb_counter : out std_logic;
     new_comb         : out std_logic;
     new_key          : out std_logic;
-    load_signature   : out std_logic
+    load_signature   : out std_logic;
+	store			 : out std_logic
   );
   end component MDM_controller;
 
@@ -78,6 +80,7 @@ architecture structural of MDM_top is
   signal comb_finished   : std_logic;
   signal mask_ready      : std_logic;
   signal load_signature  : std_logic;
+  signal store			 : std_logic;
 begin
 
   MDM_keygen_i : MDM_keygen
@@ -105,6 +108,7 @@ begin
     grain_init      => grain_init,
     signature_in    => signature_in,
     load_signature  => load_signature,
+	store_enable	=> store,
     signature_valid => signature_valid,
     grain_signature => grain_signature
   );
@@ -120,7 +124,8 @@ begin
     clr_comb_counter => clr_counter,
     new_comb         => new_comb,
     new_key          => new_key,
-    load_signature   => load_signature
+    load_signature   => load_signature,
+	store			 => store
   );
 
 end architecture;

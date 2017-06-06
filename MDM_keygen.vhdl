@@ -108,7 +108,7 @@ begin
     comb_counter_next <= comb_counter;
   end if;
 
-  if comb_counter > comb_counter_max then
+  if comb_counter > comb_counter_max + 1 then
     comb_finished <= '1';
   else
     comb_finished <= '0';

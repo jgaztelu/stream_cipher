@@ -11,6 +11,7 @@ entity MDM_signature is
 		grain_init : in std_logic;
 		signature_in : in std_logic_vector (255 downto 0);
 		load_signature : in std_logic;
+		store_enable	: in std_logic;
 		signature_valid : out std_logic;
 		grain_signature : out std_logic_vector (255 downto 0)
 		);
@@ -55,7 +56,7 @@ begin
 		case current_state is
 			when idle =>
 				shifted_in_next <= (others => '0');
-				if grain_init = '1' then
+				if (grain_init = '1' and store_enable = '1') then
 					next_state <= store;
 					--shifted_in_next <= grain_in & shifted_in (255 downto GRAIN_STEP);
 					shifted_in_next <= shifted_in (255-GRAIN_STEP downto 0) & grain_in;  -- Avoid losing one bit in the transition
@@ -70,11 +71,12 @@ begin
 					next_state <= store;
 				else
 					next_state <= acc_sign;
-          			prev_signature_next <= prev_signature xor shifted_in;
+
 				end if;
 
 			when acc_sign =>
 				signature_valid <= '1';
+      			prev_signature_next <= prev_signature xor shifted_in;
 				next_state <= idle;
 		end case;
   end if;

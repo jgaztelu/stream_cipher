@@ -54,19 +54,23 @@ begin
 	else
 		case current_state is
 			when idle =>
+				shifted_in_next <= (others => '0');
 				if grain_init = '1' then
 					next_state <= store;
+					--shifted_in_next <= grain_in & shifted_in (255 downto GRAIN_STEP);
+					shifted_in_next <= shifted_in (255-GRAIN_STEP downto 0) & grain_in;  -- Avoid losing one bit in the transition
 				else
 					next_state <= idle;
 				end if;
 
 			when store =>
+				--shifted_in_next <= grain_in & shifted_in (255 downto GRAIN_STEP);
 				shifted_in_next <= shifted_in (255-GRAIN_STEP downto 0) & grain_in;
 				if grain_init = '1' then
 					next_state <= store;
 				else
 					next_state <= acc_sign;
-          prev_signature_next <= prev_signature xor shifted_in;
+          			prev_signature_next <= prev_signature xor shifted_in;
 				end if;
 
 			when acc_sign =>

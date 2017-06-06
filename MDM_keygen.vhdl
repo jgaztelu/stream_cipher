@@ -100,7 +100,7 @@ end process;
 
 comb_counter_proc:  process (comb_counter,comb_counter_max,new_comb, clr_counter)
 begin
-  if (new_comb = '1' and comb_counter < comb_counter_max) then
+  if (new_comb = '1' and comb_counter <= comb_counter_max) then
     comb_counter_next <= comb_counter + 1;
   elsif clr_counter = '1' then
     comb_counter_next <= (others => '0');
@@ -108,7 +108,7 @@ begin
     comb_counter_next <= comb_counter;
   end if;
 
-  if comb_counter >= comb_counter_max then
+  if comb_counter > comb_counter_max then
     comb_finished <= '1';
   else
     comb_finished <= '0';

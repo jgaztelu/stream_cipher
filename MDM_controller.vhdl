@@ -55,6 +55,7 @@ begin
         next_state <= wait_mask;
       end if;
 
+
     when signature =>
 
       if signature_valid = '1' then

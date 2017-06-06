@@ -62,8 +62,8 @@ begin
 	key_in <= '0';
   mask_in <= '0';
   start_attack <= '0';
-  key_mask <= (23 => '1', others => '0');
-  IV_mask <= (47 => '1',53 => '1', 58 => '1', 64 => '1', others => '0');
+  key_mask <= (others => '0');
+  IV_mask <= (69 => '1', others => '0');
 	wait until rst = '0';
 
 	for I in 0 to 95 loop

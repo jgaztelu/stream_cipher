@@ -12,8 +12,10 @@ entity stream_cipher_top is
   key_in   : in std_logic_vector (3 downto 0);
   mask_in  : in std_logic_vector (3 downto 0);
   WEB           : in std_logic;
+  REN			: in std_logic;
   reg_full      : out std_logic;
   attack_finished : out std_logic;
+  signature_out : out std_logic_vector (7 downto 0);
   grain128a_out : out std_logic_vector (GRAIN_STEP-1 downto 0);
   espresso_out  : out std_logic
    );
@@ -87,6 +89,17 @@ port (
 );
 end component input_register;
 
+component output_register is
+	port (
+		clk	: in std_logic;
+		rst : in std_logic;
+		attack_finished : in std_logic;
+		REN	: in std_logic;
+		signature_in :	in std_logic_vector(255 downto 0);
+		signature_out : out std_logic_vector (7 downto 0)
+		);
+end component;
+
 
 
 
@@ -100,6 +113,8 @@ signal mask_ones     : unsigned (59 downto 0);
 signal grain_stream  : std_logic_vector (GRAIN_STEP-1 downto 0);
 signal grain_init    : std_logic;
 signal grain_new_key : std_logic;
+signal grain_signature : std_logic_vector (255 downto 0);
+signal attack_finished_sig : std_logic;
 
 begin
 
@@ -162,10 +177,21 @@ port map (
   key_masked       => key_masked,
   IV_masked        => IV_masked,
   new_key          => grain_new_key,
-  finished		   => attack_finished,
-  grain_signature  => open
+  finished		   => attack_finished_sig,
+  grain_signature  => grain_signature
+);
+
+output_register_i : output_register
+port map (
+  clk	=> clk,
+  rst	=> rst,
+  attack_finished => attack_finished_sig,
+  REN	=> REN,
+  signature_in => grain_signature,
+  signature_out	=> signature_out
 );
 
 grain128a_out <= grain_stream;
+attack_finished <= attack_finished_sig;
 
 end architecture;

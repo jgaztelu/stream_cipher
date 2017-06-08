@@ -7,8 +7,8 @@ entity input_register is
   clk      : in std_logic;
   rst      : in std_logic;
   WEB      : in std_logic; -- Write enable
-  key_in   : in std_logic;
-  mask_in  : in std_logic;
+  key_in   : in std_logic_vector (3 downto 0);
+  mask_in  : in std_logic_vector (3 downto 0);
   new_key  : in std_logic;
   reg_full : out std_logic;
   key      : out std_logic_vector (127 downto 0);
@@ -31,12 +31,12 @@ process (clk,rst)
 begin
   if rst = '1' then
 	shifted_in_key <= (others => '0');
-  shifted_in_mask <= (others => '0');
+  	shifted_in_mask <= (others => '0');
 	in_counter <= (others => '0');
-  ones_count <= (others => '0');
+  	ones_count <= (others => '0');
   elsif clk'event and clk='1' then
 	shifted_in_key <= shifted_in_key_next;
-  shifted_in_mask <= shifted_in_mask_next;
+  	shifted_in_mask <= shifted_in_mask_next;
 	in_counter <= in_counter_next;
   ones_count <= ones_count_next;
   end if;
@@ -49,15 +49,15 @@ begin
   in_counter_next <= in_counter;
   if WEB = '1' then
 	in_counter_next <= in_counter + 1;
-	shifted_in_key_next <= shifted_in_key (222 downto 0) & key_in;
-  shifted_in_mask_next <= shifted_in_mask (222 downto 0) & mask_in;
+	shifted_in_key_next <= shifted_in_key (219 downto 0) & key_in;
+  	shifted_in_mask_next <= shifted_in_mask (219 downto 0) & mask_in;
   elsif new_key = '1' then
 	in_counter_next <= (others => '0');
   else
 	in_counter_next <= in_counter;
   end if;
 
-  if in_counter >= 223 then
+  if in_counter >= 56 then
 	reg_full <= '1';
   else
 	reg_full <= '0';

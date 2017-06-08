@@ -60,12 +60,10 @@ begin
 
     when signature =>
 	  store <= '1';
-      if signature_valid = '1' then
-        if comb_finished = '1' then
-          next_state <= idle;
-        else
+	  if comb_finished = '1' then
+		next_state <= idle;
+      elsif signature_valid = '1' then  
           next_state <= wait_mask;
-        end if;
       else
         next_state <= signature;
       end if;

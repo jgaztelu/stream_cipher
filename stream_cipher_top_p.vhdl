@@ -9,10 +9,11 @@ entity stream_cipher_top_p is
   rst : in std_logic;
   start_attack : in std_logic;
   new_key : in std_logic;
-  key_in : in std_logic;
-  mask_in : in std_logic;
+  key_in   : in std_logic_vector (3 downto 0);
+  mask_in  : in std_logic_vector (3 downto 0);
   WEB	  : in std_logic;
   reg_full : out std_logic;
+  attack_finished : out std_logic;
   grain128a_out : out std_logic_vector (GRAIN_STEP-1 downto 0);
   espresso_out : out std_logic
    );
@@ -27,11 +28,12 @@ component stream_cipher_top is
   rst : in std_logic;
   start_attack : in std_logic;
   new_key : in std_logic;
-  key_in : in std_logic;
-  mask_in : in std_logic;
+  key_in   : in std_logic_vector (3 downto 0);
+  mask_in  : in std_logic_vector (3 downto 0);
   WEB	: in std_logic;
   -- Outputs
   reg_full : out std_logic;
+  attack_finished : out std_logic;
   grain128a_out : out std_logic_vector (GRAIN_STEP-1 downto 0);
   espresso_out : out std_logic
   );
@@ -58,10 +60,11 @@ signal clk_i : std_logic;
 signal rst_i : std_logic;
 signal new_key_i : std_logic;
 signal start_attack_i : std_logic;
-signal key_in_i : std_logic;
-signal mask_in_i : std_logic;
+signal key_in_i : std_logic_vector (3 downto 0);
+signal mask_in_i : std_logic_vector (3 downto 0);
 signal WEB_i	: std_logic;
 signal reg_full_i : std_logic;
+signal attack_finished_i : std_logic;
 -- Output signal for grain component
 signal grain128a_out_i: std_logic_vector (GRAIN_STEP-1 downto 0);
 -- Output signal for espresso component
@@ -86,11 +89,15 @@ begin
   StartAttackPad : CPAD_S_74x50u_IN
     port map (COREIO => start_attack_i, PADIO => start_attack);
 
-  KeyInPad : CPAD_S_74x50u_IN
-    port map (COREIO => key_in_i, PADIO => key_in);
+  KeyInPads: for I in 0 to 3 generate
+  	KeyInPad : CPAD_S_74x50u_IN
+    port map (COREIO => key_in_i(I), PADIO => key_in(I));
+  end generate;
 
-  MaskInPad : CPAD_S_74x50u_IN
-    port map (COREIO => mask_in_i, PADIO => mask_in);
+  MaskInPads : for I in 0 to 3 generate
+    MaskInPad : CPAD_S_74x50u_IN
+    port map (COREIO => mask_in_i(I), PADIO => mask_in(I));
+  end generate;
   
   WEBPad : CPAD_S_74x50u_IN
     port map (COREIO => WEB_i, PADIO =>WEB);
@@ -99,7 +106,7 @@ begin
 
 -- Output pad for Grain128a cipher
   grain128aPads : for I in 0 to (GRAIN_STEP-1) generate
-    streamPad : CPAD_S_74x50u_OUT
+    grainPad : CPAD_S_74x50u_OUT
     port map (COREIO => grain128a_out_i(I), PADIO => grain128a_out(I));
   end generate;
 
@@ -109,6 +116,9 @@ begin
 
   RegFullPad: CPAD_S_74x50u_OUT
     port map (COREIO => reg_full_i, PADIO => reg_full);
+
+  AttackFinishedPad: CPAD_S_74x50u_OUT
+    port map (COREIO => attack_finished_i, PADIO => attack_finished);
 
 stream_cipher_top_i: stream_cipher_top
   port map (
@@ -122,6 +132,7 @@ stream_cipher_top_i: stream_cipher_top
   WEB => WEB_i,
   -- Outputs
   reg_full => reg_full_i,
+  attack_finished => attack_finished_i,
   grain128a_out => grain128a_out_i,
   espresso_out => espresso_out_i
   );

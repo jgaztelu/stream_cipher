@@ -9,10 +9,11 @@ entity stream_cipher_top is
   rst           : in std_logic;
   start_attack  : in std_logic;
   new_key       : in std_logic;
-  key_in        : in std_logic;
-  mask_in       : in std_logic;
+  key_in   : in std_logic_vector (3 downto 0);
+  mask_in  : in std_logic_vector (3 downto 0);
   WEB           : in std_logic;
   reg_full      : out std_logic;
+  attack_finished : out std_logic;
   grain128a_out : out std_logic_vector (GRAIN_STEP-1 downto 0);
   espresso_out  : out std_logic
    );
@@ -63,6 +64,7 @@ port (
   key_masked       : out std_logic_vector (127 downto 0);
   IV_masked        : out std_logic_vector (95 downto 0);
   new_key          : out std_logic;
+  finished		   : out std_logic;
   grain_signature  : out std_logic_vector (255 downto 0)
 );
 end component MDM_top;
@@ -73,8 +75,8 @@ port (
   clk       : in  std_logic;
   rst       : in  std_logic;
   WEB       : in  std_logic;
-  key_in    : in  std_logic;
-  mask_in   : in  std_logic;
+  key_in   : in std_logic_vector (3 downto 0);
+  mask_in  : in std_logic_vector (3 downto 0);
   new_key   : in  std_logic;
   reg_full  : out std_logic;
   key       : out std_logic_vector (127 downto 0);
@@ -98,6 +100,7 @@ signal mask_ones     : unsigned (59 downto 0);
 signal grain_stream  : std_logic_vector (GRAIN_STEP-1 downto 0);
 signal grain_init    : std_logic;
 signal grain_new_key : std_logic;
+
 begin
 
   grain128a_top_i : grain128a_top
@@ -159,6 +162,7 @@ port map (
   key_masked       => key_masked,
   IV_masked        => IV_masked,
   new_key          => grain_new_key,
+  finished		   => attack_finished,
   grain_signature  => open
 );
 

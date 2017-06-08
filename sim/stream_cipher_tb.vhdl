@@ -14,8 +14,8 @@ architecture testbench of stream_cipher_tb is
     rst           : in  std_logic;
     start_attack  : in  std_logic;
     new_key       : in  std_logic;
-    key_in        : in  std_logic;
-    mask_in       : in  std_logic;
+    key_in   : in std_logic_vector (3 downto 0);
+    mask_in  : in std_logic_vector (3 downto 0);
     WEB           : in  std_logic;
     reg_full      : out std_logic;
     grain128a_out : out std_logic_vector (GRAIN_STEP-1 downto 0);
@@ -24,7 +24,8 @@ architecture testbench of stream_cipher_tb is
   end component stream_cipher_top;
 
 
-signal clk,rst,start_attack,new_key,key_in,mask_in,WEB,reg_full : std_logic;
+signal clk,rst,start_attack,new_key,WEB,reg_full : std_logic;
+signal key_in,mask_in	:	std_logic_vector(3 downto 0);
 signal grain128a_out : std_logic_vector (GRAIN_STEP-1 downto 0);
 signal espresso_out : std_logic;
 
@@ -33,7 +34,8 @@ signal IV	:	std_logic_vector (95 downto 0) := (others => '0');
 signal key_mask : std_logic_vector (127 downto 0);
 signal IV_mask  : std_logic_vector (95 downto 0);
 signal save_grain : std_logic_vector (319 downto 0);
-shared variable i :  integer range 0 to 1024;
+shared variable i :  integer range 0 to 1024 := 0;
+shared variable j :  integer range 0 to 1024 := 0;
 
 constant clk_period : time := 5 ns;
 
@@ -59,24 +61,28 @@ datainproc: process
 begin
 	WEB <= '0';
 	new_key <= '0';
-	key_in <= '0';
-  mask_in <= '0';
-  start_attack <= '0';
-  key_mask <= (others => '0');
-  IV_mask <= (69 => '1',others => '0');
+	key_in <= (others => '0');
+  	mask_in <= (others => '0');
+  	start_attack <= '0';
+  	key_mask <= (others => '0');
+  	IV_mask <= (64 => '1',58 => '1',61 => '1',44 => '1', others => '0');
 	wait until rst = '0';
 
-	for I in 0 to 95 loop
+	for I in 0 to 23 loop
 		WEB <= '1';
-		key_in <= IV(I);
-    mask_in <= IV_mask (I);
+		for J in 0 to 3 loop
+			key_in (J) <= IV (4*I+J);
+			mask_in (J) <= IV_mask (4*I+J);
+		end loop;	
 		wait for clk_period;
-	end loop;
+	end loop;	
 
-	for I in 0 to 127 loop
+	for I in 0 to 31 loop
 		WEB <= '1';
-		key_in <= key(I);
-    mask_in <= key_mask (I);
+		for J in 0 to 3 loop
+			key_in (J) <= key(4*I+J);
+			mask_in (J) <= key_mask (4*I+J);
+		end loop;	
 		wait for clk_period;
 	end loop;
 

@@ -38,7 +38,7 @@ begin
 	shifted_in_key <= shifted_in_key_next;
   	shifted_in_mask <= shifted_in_mask_next;
 	in_counter <= in_counter_next;
-  ones_count <= ones_count_next;
+  	ones_count <= ones_count_next;
   end if;
 end process;
 
@@ -50,7 +50,8 @@ begin
   if WEB = '1' then
 	in_counter_next <= in_counter + 1;
 	shifted_in_key_next <= shifted_in_key (219 downto 0) & key_in;
-  	shifted_in_mask_next <= shifted_in_mask (219 downto 0) & mask_in;
+	shifted_in_mask_next <= mask_in & shifted_in_mask (223 downto 4);
+  	--shifted_in_mask_next <= shifted_in_mask (219 downto 0) & mask_in;
   elsif new_key = '1' then
 	in_counter_next <= (others => '0');
   else
@@ -65,11 +66,22 @@ begin
 end process;
 
 count_ones : process(WEB,mask_in,new_key,ones_count)
+
 begin
   if new_key = '1' then
     ones_count_next <= (others => '0');
-  elsif (WEB = '1' and mask_in = '1') then
-      ones_count_next <= ones_count (58 downto 0) & mask_in;
+  elsif (WEB = '1') then
+	if (mask_in = "0001" or mask_in = "0010" or mask_in = "0100" or mask_in = "1000") then	-- Number of ones: 1
+		ones_count_next <= ones_count (58 downto 0) & '1';
+	elsif (mask_in = "0011" or mask_in = "0101" or mask_in = "1001" or mask_in = "1010" or mask_in = "0110" or mask_in = "1100") then
+		ones_count_next <= ones_count (57 downto 0) & "11";
+	elsif (mask_in = "0111" or mask_in = "1011" or mask_in = "1101" or mask_in = "1110") then
+		ones_count_next <= ones_count (56 downto 0) & "111";
+	elsif (mask_in = "1111") then
+		ones_count_next <= ones_count (55 downto 0) & "1111";
+	else
+		ones_count_next <= ones_count;
+	end if;	
   else
     ones_count_next <= ones_count;
   end if;
@@ -77,8 +89,8 @@ end process;
 
 key <= shifted_in_key (127 downto 0);
 IV <= shifted_in_key (223 downto 128);
-key_mask <= shifted_in_mask (127 downto 0);
-IV_mask <= shifted_in_mask (223 downto 128);
+IV_mask <= shifted_in_mask (95 downto 0);
+key_mask <= shifted_in_mask (223 downto 96);
 mask_ones <= ones_count;
 
 end architecture;

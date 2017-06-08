@@ -20,6 +20,7 @@ entity MDM_top is
   key_masked       : out std_logic_vector (127 downto 0);
   IV_masked        : out std_logic_vector (95 downto 0);
   new_key          : out std_logic;
+  finished		   : out std_logic;
   grain_signature  : out std_logic_vector (255 downto 0)
   );
 end entity;
@@ -77,7 +78,7 @@ architecture structural of MDM_top is
   signal new_comb        : std_logic;
   signal clr_counter     : std_logic;
   signal signature_valid : std_logic;
-  signal comb_finished   : std_logic;
+  signal comb_finished_sig   : std_logic;
   signal mask_ready      : std_logic;
   signal load_signature  : std_logic;
   signal store			 : std_logic;
@@ -97,7 +98,7 @@ begin
     key_masked       => key_masked,
     IV_masked        => IV_masked,
     mask_ready       => mask_ready,
-    comb_finished    => comb_finished
+    comb_finished    => comb_finished_sig
   );
 
   MDM_signature_i : MDM_signature
@@ -120,7 +121,7 @@ begin
     start            => start,
     signature_valid  => signature_valid,
     mask_ready       => mask_ready,
-    comb_finished    => comb_finished,
+    comb_finished    => comb_finished_sig,
     clr_comb_counter => clr_counter,
     new_comb         => new_comb,
     new_key          => new_key,
@@ -128,4 +129,5 @@ begin
 	store			 => store
   );
 
+finished <= comb_finished_sig;
 end architecture;

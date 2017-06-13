@@ -8,23 +8,26 @@ end entity;
 
 architecture testbench of stream_cipher_tb is
 
-  component stream_cipher_top
+component stream_cipher_top is
   port (
-    clk           : in  std_logic;
-    rst           : in  std_logic;
-    start_attack  : in  std_logic;
-    new_key       : in  std_logic;
-    key_in   : in std_logic_vector (3 downto 0);
-    mask_in  : in std_logic_vector (3 downto 0);
-    WEB           : in  std_logic;
-    reg_full      : out std_logic;
-    grain128a_out : out std_logic_vector (GRAIN_STEP-1 downto 0);
-    espresso_out  : out std_logic
-  );
-  end component stream_cipher_top;
+  clk           : in std_logic;
+  rst           : in std_logic;
+  start_attack  : in std_logic;
+  new_key       : in std_logic;
+  key_in   : in std_logic_vector (3 downto 0);
+  mask_in  : in std_logic_vector (3 downto 0);
+  WEB           : in std_logic;
+  REN			: in std_logic;
+  reg_full      : out std_logic;
+  attack_finished : out std_logic;
+  signature_out : out std_logic_vector (7 downto 0);
+  grain128a_out : out std_logic_vector (GRAIN_STEP-1 downto 0);
+  espresso_out  : out std_logic
+   );
+end component;
 
 
-signal clk,rst,start_attack,new_key,WEB,reg_full : std_logic;
+signal clk,rst,start_attack,new_key,WEB,REN,reg_full : std_logic;
 signal key_in,mask_in	:	std_logic_vector(3 downto 0);
 signal grain128a_out : std_logic_vector (GRAIN_STEP-1 downto 0);
 signal espresso_out : std_logic;
@@ -60,6 +63,7 @@ end process;
 datainproc: process
 begin
 	WEB <= '0';
+	REN <= '0';
 	new_key <= '0';
 	key_in <= (others => '0');
   	mask_in <= (others => '0');
@@ -123,6 +127,7 @@ port map (
   new_key       => new_key,
   key_in        => key_in,
   mask_in       => mask_in,
+  REN			=> REN,
   WEB           => WEB,
   reg_full      => reg_full,
   grain128a_out => grain128a_out,
